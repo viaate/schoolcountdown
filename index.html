@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pembroke Hill — Last Day Countdown</title>
+  <style>
+    :root {
+      --blue:      #00285E;
+      --blue-mid:  #003d8f;
+      --blue-light:#0055c4;
+      --gold:      #FFB81C;
+      --gold-dark: #d99800;
+      --white:     #ffffff;
+      --card-bg:   rgba(255,255,255,0.07);
+      --card-border:rgba(255,184,28,0.35);
+      --shadow:    0 8px 32px rgba(0,0,0,0.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, var(--blue) 0%, var(--blue-mid) 50%, #001f4a 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .school-name {
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--white);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    .page-title span {
+      color: var(--gold);
+    }
+
+    .page-subtitle {
+      margin-top: 0.5rem;
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Divider ─────────────────────────────────────── */
+    .divider {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 1.2rem auto;
+      border-radius: 2px;
+    }
+
+    /* ── Grid ────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* ── Card ────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem 1.75rem 1.75rem;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+    }
+
+    .card-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+    }
+
+    .card-label {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Digit blocks ────────────────────────────────── */
+    .blocks {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+    }
+
+    .block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 64px;
+    }
+
+    .block-num {
+      font-size: clamp(2.4rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--white);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 0.3em 0.4em;
+      min-width: 2ch;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      transition: color 0.15s;
+    }
+
+    .block-unit {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-top: 0.35rem;
+      font-weight: 600;
+    }
+
+    .colon {
+      font-size: clamp(2rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: rgba(255,255,255,0.3);
+      align-self: flex-start;
+      padding-top: 0.25em;
+      margin: 0 -0.1rem;
+      line-height: 1;
+    }
+
+    /* single big number (school days card) */
+    .big-num {
+      font-size: clamp(4rem, 10vw, 6rem);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(255,184,28,0.4);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .big-unit {
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      font-weight: 600;
+    }
+
+    /* ── Today card special states ───────────────────── */
+    .today-message {
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      color: rgba(255,255,255,0.6);
+      font-style: italic;
+      padding: 0.5rem 0;
+    }
+
+    .today-message.active {
+      color: var(--gold);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .card.done { opacity: 0.6; }
+
+    .card.done .big-num,
+    .card.done .block-num { color: rgba(255,255,255,0.4); }
+
+    /* done banner */
+    .done-banner {
+      position: absolute;
+      top: 14px; right: -26px;
+      background: var(--gold);
+      color: var(--blue);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 36px;
+      transform: rotate(35deg);
+    }
+
+    /* ── School hours note ───────────────────────────── */
+    .hours-note {
+      margin-top: 1rem;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ──────────────────────────────────────── */
+    footer {
+      margin-top: 3rem;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    /* ── Responsive tweaks ───────────────────────────── */
+    @media (max-width: 480px) {
+      .grid { grid-template-columns: 1fr; }
+      .block-num { font-size: 2rem; }
+    }
+
+    /* pulse animation for active today card */
+    @keyframes pulse-gold {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,184,28,0); }
+      50% { box-shadow: 0 0 0 6px rgba(255,184,28,0.18); }
+    }
+    .card.in-school { animation: pulse-gold 2.5s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <p class="school-name">Pembroke Hill School</p>
+    <h1 class="page-title">Countdown to <span>Last Day</span></h1>
+    <div class="divider"></div>
+    <p class="page-subtitle">May 21, 2026 &nbsp;·&nbsp; 11:45 AM</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- Card 1: All days (total time) -->
+    <div class="card" id="card-total">
+      <div class="card-icon">📅</div>
+      <div class="card-label">Total Time Remaining</div>
+      <div class="blocks" id="blocks-total">
+        <div class="block"><div class="block-num" id="t-days">--</div><div class="block-unit">days</div></div>
+        <div class="colon">:</div>
+        <div class="block"><div class="block-num" id="t-hours">--</div><div class="block-unit">hrs</div></div>
+        <div class="colon">:</div>
+        <div class="block"><div class="block-num" id="t-min">--</div><div class="block-unit">min</div></div>
+        <div class="colon">:</div>
+        <div class="block"><div class="block-num" id="t-sec">--</div><div class="block-unit">sec</div></div>
+      </div>
+    </div>
+
+    <!-- Card 2: Weekdays only -->
+    <div class="card" id="card-weekdays">
+      <div class="card-icon">🏫</div>
+      <div class="card-label">School Days Left</div>
+      <div class="big-num" id="weekdays-num">--</div>
+      <div class="big-unit" id="weekdays-unit">weekdays</div>
+    </div>
+
+    <!-- Card 3: Total school hours remaining -->
+    <div class="card" id="card-hours">
+      <div class="card-icon">⏳</div>
+      <div class="card-label">School Hours Remaining</div>
+      <div class="blocks" id="blocks-hours">
+        <div class="block"><div class="block-num" id="h-hours">--</div><div class="block-unit">hrs</div></div>
+        <div class="colon">:</div>
+        <div class="block"><div class="block-num" id="h-min">--</div><div class="block-unit">min</div></div>
+        <div class="colon">:</div>
+        <div class="block"><div class="block-num" id="h-sec">--</div><div class="block-unit">sec</div></div>
+      </div>
+      <div class="hours-note">
+        Mon / Tue / Wed / Fri &nbsp; 8:45 am – 3:20 pm<br>
+        Thursday &nbsp; 10:00 am – 3:20 pm<br>
+        Last day (May 21, Thu) &nbsp; 10:00 am – 11:45 am
+      </div>
+    </div>
+
+    <!-- Card 4: Today's school time (weekdays only) -->
+    <div class="card" id="card-today">
+      <div class="card-icon">🔔</div>
+      <div class="card-label">Today's School Time Left</div>
+      <div id="today-content">
+        <p class="today-message" id="today-message">Loading…</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Updates every second &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; Last Day: May 21, 2026
+  </footer>
+
+  <script>
+    // ── Constants ───────────────────────────────────────────────────
+    const LAST_DAY = new Date(2026, 4, 21, 11, 45, 0, 0); // May 21 2026 11:45:00
+
+    // School start/end for each weekday (0=Sun … 6=Sat)
+    const SCHOOL = {
+      // regular: Mon(1) Tue(2) Wed(3) Fri(5) → 8:45–15:20
+      regular: { startH: 8, startM: 45, endH: 15, endM: 20 },
+      // Thursday(4) → 10:00–15:20
+      thursday: { startH: 10, startM: 0, endH: 15, endM: 20 },
+      // Last day override: Thu → 10:00–11:45
+      lastDay: { startH: 10, startM: 0, endH: 11, endM: 45 }
+    };
+
+    function isWeekday(d) { const wd = d.getDay(); return wd >= 1 && wd <= 5; }
+    function isThursday(d) { return d.getDay() === 4; }
+    function isLastDay(d) {
+      return d.getFullYear() === 2026 && d.getMonth() === 4 && d.getDate() === 21;
+    }
+
+    function schoolSchedule(d) {
+      if (isLastDay(d)) return SCHOOL.lastDay;
+      if (isThursday(d)) return SCHOOL.thursday;
+      return SCHOOL.regular;
+    }
+
+    function dayStart(d, hh, mm) {
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hh, mm, 0, 0);
+    }
+
+    // ── Total time countdown ─────────────────────────────────────────
+    function calcTotal(now) {
+      const diff = Math.max(0, LAST_DAY - now);
+      const totalSec = Math.floor(diff / 1000);
+      const days  = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins  = Math.floor((totalSec % 3600) / 60);
+      const secs  = totalSec % 60;
+      return { days, hours, mins, secs, done: diff <= 0 };
+    }
+
+    // ── Weekdays remaining ───────────────────────────────────────────
+    function calcWeekdays(now) {
+      if (now >= LAST_DAY) return 0;
+
+      let count = 0;
+      // Clone to midnight of today
+      let cur = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      while (cur <= LAST_DAY) {
+        if (isWeekday(cur)) {
+          const sched = schoolSchedule(cur);
+          const schoolEnd = dayStart(cur, sched.endH, sched.endM);
+          // Count today only if school hasn't ended yet
+          if (cur.toDateString() === now.toDateString()) {
+            if (now < schoolEnd) count++;
+          } else {
+            count++;
+          }
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+      return count;
+    }
+
+    // ── Total school minutes remaining (live, counts seconds) ────────
+    function calcSchoolSeconds(now) {
+      if (now >= LAST_DAY) return 0;
+
+      let totalMs = 0;
+
+      // --- today's contribution ---
+      if (isWeekday(now)) {
+        const sched = schoolSchedule(now);
+        const schoolStart = dayStart(now, sched.startH, sched.startM);
+        const schoolEnd   = dayStart(now, sched.endH,   sched.endM);
+
+        if (now < schoolEnd) {
+          // some school remaining today
+          const effectiveStart = now > schoolStart ? now : schoolStart;
+          totalMs += schoolEnd - effectiveStart;
+        }
+      }
+
+      // --- future weekdays ---
+      let cur = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      cur.setDate(cur.getDate() + 1); // start from tomorrow
+
+      while (cur <= LAST_DAY) {
+        if (isWeekday(cur)) {
+          const sched = schoolSchedule(cur);
+          const schoolStart = dayStart(cur, sched.startH, sched.startM);
+          const schoolEnd   = dayStart(cur, sched.endH,   sched.endM);
+          totalMs += schoolEnd - schoolStart;
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      return Math.max(0, Math.floor(totalMs / 1000));
+    }
+
+    // ── Today's school time remaining ───────────────────────────────
+    function calcTodaySchool(now) {
+      // Returns { state: 'weekend'|'before'|'in'|'after'|'done', secLeft, startStr, endStr }
+      if (now >= LAST_DAY) return { state: 'done' };
+
+      if (!isWeekday(now)) return { state: 'weekend' };
+
+      const sched = schoolSchedule(now);
+      const schoolStart = dayStart(now, sched.startH, sched.startM);
+      const schoolEnd   = dayStart(now, sched.endH,   sched.endM);
+
+      const fmt = (h, m) => {
+        const ampm = h < 12 ? 'AM' : 'PM';
+        const hh = h % 12 || 12;
+        return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+      };
+
+      const startStr = fmt(sched.startH, sched.startM);
+      const endStr   = fmt(sched.endH,   sched.endM);
+
+      if (now < schoolStart) {
+        return { state: 'before', startStr, endStr };
+      }
+      if (now >= schoolEnd) {
+        return { state: 'after', startStr, endStr };
+      }
+      const secLeft = Math.floor((schoolEnd - now) / 1000);
+      return { state: 'in', secLeft, startStr, endStr };
+    }
+
+    // ── Format helpers ──────────────────────────────────────────────
+    function pad(n, len = 2) { return String(n).padStart(len, '0'); }
+
+    function secToHMS(s) {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      return { h, m, sec };
+    }
+
+    // ── DOM references ───────────────────────────────────────────────
+    const elTDays   = document.getElementById('t-days');
+    const elTHours  = document.getElementById('t-hours');
+    const elTMin    = document.getElementById('t-min');
+    const elTSec    = document.getElementById('t-sec');
+    const cardTotal = document.getElementById('card-total');
+
+    const elWNum    = document.getElementById('weekdays-num');
+    const elWUnit   = document.getElementById('weekdays-unit');
+    const cardWeek  = document.getElementById('card-weekdays');
+
+    const elHHours  = document.getElementById('h-hours');
+    const elHMin    = document.getElementById('h-min');
+    const elHSec    = document.getElementById('h-sec');
+    const cardHours = document.getElementById('card-hours');
+
+    const cardToday       = document.getElementById('card-today');
+    const todayContent    = document.getElementById('today-content');
+
+    function addDoneBanner(card) {
+      if (!card.querySelector('.done-banner')) {
+        const b = document.createElement('div');
+        b.className = 'done-banner';
+        b.textContent = 'DONE!';
+        card.appendChild(b);
+      }
+    }
+
+    // ── Main update ─────────────────────────────────────────────────
+    function update() {
+      const now = new Date();
+
+      // 1. Total countdown
+      const tot = calcTotal(now);
+      if (tot.done) {
+        elTDays.textContent  = '00';
+        elTHours.textContent = '00';
+        elTMin.textContent   = '00';
+        elTSec.textContent   = '00';
+        cardTotal.classList.add('done');
+        addDoneBanner(cardTotal);
+      } else {
+        elTDays.textContent  = pad(tot.days, 2);
+        elTHours.textContent = pad(tot.hours);
+        elTMin.textContent   = pad(tot.mins);
+        elTSec.textContent   = pad(tot.secs);
+        cardTotal.classList.remove('done');
+      }
+
+      // 2. Weekdays
+      const wd = calcWeekdays(now);
+      elWNum.textContent  = wd;
+      elWUnit.textContent = wd === 1 ? 'school day' : 'school days';
+      if (wd === 0) {
+        cardWeek.classList.add('done');
+        addDoneBanner(cardWeek);
+      } else {
+        cardWeek.classList.remove('done');
+      }
+
+      // 3. School hours
+      const schoolSec = calcSchoolSeconds(now);
+      const hms = secToHMS(schoolSec);
+      elHHours.textContent = pad(hms.h, 3);
+      elHMin.textContent   = pad(hms.m);
+      elHSec.textContent   = pad(hms.sec);
+      if (schoolSec === 0) {
+        cardHours.classList.add('done');
+        addDoneBanner(cardHours);
+      } else {
+        cardHours.classList.remove('done');
+      }
+
+      // 4. Today
+      const td = calcTodaySchool(now);
+      cardToday.classList.remove('in-school', 'done');
+
+      let html = '';
+      if (td.state === 'done') {
+        html = `<p class="today-message">🎉 School's out — forever!</p>`;
+        cardToday.classList.add('done');
+        addDoneBanner(cardToday);
+      } else if (td.state === 'weekend') {
+        html = `<p class="today-message">No school today.<br><span style="font-size:0.85em;opacity:0.7">Check back on a weekday!</span></p>`;
+      } else if (td.state === 'before') {
+        html = `<p class="today-message">School starts at <strong>${td.startStr}</strong><br>
+                <span style="font-size:0.85em;opacity:0.7">Ends at ${td.endStr}</span></p>`;
+      } else if (td.state === 'in') {
+        const { h, m, sec } = secToHMS(td.secLeft);
+        cardToday.classList.add('in-school');
+        html = `
+          <div class="blocks" style="margin-bottom:0.5rem">
+            <div class="block"><div class="block-num" style="color:var(--gold)">${pad(h)}</div><div class="block-unit">hrs</div></div>
+            <div class="colon">:</div>
+            <div class="block"><div class="block-num" style="color:var(--gold)">${pad(m)}</div><div class="block-unit">min</div></div>
+            <div class="colon">:</div>
+            <div class="block"><div class="block-num" style="color:var(--gold)">${pad(sec)}</div><div class="block-unit">sec</div></div>
+          </div>
+          <p style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:0.4rem">Until ${td.endStr} · You're in school right now!</p>`;
+      } else { // after
+        html = `<p class="today-message">School ended at ${td.endStr}<br>
+                <span style="font-size:0.85em;opacity:0.7">See you tomorrow 👋</span></p>`;
+      }
+      todayContent.innerHTML = html;
+    }
+
+    update();
+    setInterval(update, 1000);
+  </script>
+</body>
+</html>
