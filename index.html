@@ -78,10 +78,10 @@
     /* ── Grid ────────────────────────────────────────── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
       width: 100%;
-      max-width: 1100px;
+      max-width: 900px;
     }
 
     /* ── Card ────────────────────────────────────────── */
@@ -311,8 +311,9 @@
       <div class="hours-note">
         Mon / Tue / Wed / Fri &nbsp; 8:45 am – 3:20 pm<br>
         Thursday &nbsp; 10:00 am – 3:20 pm<br>
-        Week of May 21 (Mon–Wed) &nbsp; 9:00 am – 11:30 am<br>
-        Last day (May 21, Thu) &nbsp; 10:00 am – 11:45 am
+        May 19–20 (Tue/Wed) &nbsp; 9:00 am – 11:30 am<br>
+        May 18 (Mon) &nbsp; No school<br>
+        Last day May 21 (Thu) &nbsp; 9:00 am – 11:45 am
       </div>
     </div>
 
@@ -341,21 +342,25 @@
       regular:   { startH: 8,  startM: 45, endH: 15, endM: 20 },
       // Thursday(4) → 10:00–15:20
       thursday:  { startH: 10, startM: 0,  endH: 15, endM: 20 },
-      // Week of May 21 (Mon May 18 – Wed May 20) → 9:00–11:30
+      // Last week Tue May 19 + Wed May 20 → 9:00–11:30
       lastWeek:  { startH: 9,  startM: 0,  endH: 11, endM: 30 },
-      // Last day (Thu May 21) → 10:00–11:45
-      lastDay:   { startH: 10, startM: 0,  endH: 11, endM: 45 }
+      // Last day Thu May 21 → 9:00–11:45
+      lastDay:   { startH: 9,  startM: 0,  endH: 11, endM: 45 }
     };
 
+    // May 18 (Mon) is a no-school day
+    function isNoSchool(d) {
+      return d.getFullYear() === 2026 && d.getMonth() === 4 && d.getDate() === 18;
+    }
     function isWeekday(d) { const wd = d.getDay(); return wd >= 1 && wd <= 5; }
     function isThursday(d) { return d.getDay() === 4; }
     function isLastDay(d) {
       return d.getFullYear() === 2026 && d.getMonth() === 4 && d.getDate() === 21;
     }
-    // Mon May 18 – Wed May 20 (last week before last day)
+    // Tue May 19 + Wed May 20 (shortened last week, Mon is off)
     function isLastWeek(d) {
       return d.getFullYear() === 2026 && d.getMonth() === 4 &&
-             d.getDate() >= 18 && d.getDate() <= 20;
+             d.getDate() >= 19 && d.getDate() <= 20;
     }
 
     function schoolSchedule(d) {
@@ -389,7 +394,7 @@
       let cur = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
       while (cur <= LAST_DAY) {
-        if (isWeekday(cur)) {
+        if (isWeekday(cur) && !isNoSchool(cur)) {
           const sched = schoolSchedule(cur);
           const schoolEnd = dayStart(cur, sched.endH, sched.endM);
           // Count today only if school hasn't ended yet
@@ -411,7 +416,7 @@
       let totalMs = 0;
 
       // --- today's contribution ---
-      if (isWeekday(now)) {
+      if (isWeekday(now) && !isNoSchool(now)) {
         const sched = schoolSchedule(now);
         const schoolStart = dayStart(now, sched.startH, sched.startM);
         const schoolEnd   = dayStart(now, sched.endH,   sched.endM);
@@ -428,7 +433,7 @@
       cur.setDate(cur.getDate() + 1); // start from tomorrow
 
       while (cur <= LAST_DAY) {
-        if (isWeekday(cur)) {
+        if (isWeekday(cur) && !isNoSchool(cur)) {
           const sched = schoolSchedule(cur);
           const schoolStart = dayStart(cur, sched.startH, sched.startM);
           const schoolEnd   = dayStart(cur, sched.endH,   sched.endM);
@@ -445,7 +450,7 @@
       // Returns { state: 'weekend'|'before'|'in'|'after'|'done', secLeft, startStr, endStr }
       if (now >= LAST_DAY) return { state: 'done' };
 
-      if (!isWeekday(now)) return { state: 'weekend' };
+      if (!isWeekday(now) || isNoSchool(now)) return { state: 'weekend' };
 
       const sched = schoolSchedule(now);
       const schoolStart = dayStart(now, sched.startH, sched.startM);
