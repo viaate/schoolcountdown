@@ -311,6 +311,7 @@
       <div class="hours-note">
         Mon / Tue / Wed / Fri &nbsp; 8:45 am – 3:20 pm<br>
         Thursday &nbsp; 10:00 am – 3:20 pm<br>
+        Week of May 21 (Mon–Wed) &nbsp; 9:00 am – 11:30 am<br>
         Last day (May 21, Thu) &nbsp; 10:00 am – 11:45 am
       </div>
     </div>
@@ -337,11 +338,13 @@
     // School start/end for each weekday (0=Sun … 6=Sat)
     const SCHOOL = {
       // regular: Mon(1) Tue(2) Wed(3) Fri(5) → 8:45–15:20
-      regular: { startH: 8, startM: 45, endH: 15, endM: 20 },
+      regular:   { startH: 8,  startM: 45, endH: 15, endM: 20 },
       // Thursday(4) → 10:00–15:20
-      thursday: { startH: 10, startM: 0, endH: 15, endM: 20 },
-      // Last day override: Thu → 10:00–11:45
-      lastDay: { startH: 10, startM: 0, endH: 11, endM: 45 }
+      thursday:  { startH: 10, startM: 0,  endH: 15, endM: 20 },
+      // Week of May 21 (Mon May 18 – Wed May 20) → 9:00–11:30
+      lastWeek:  { startH: 9,  startM: 0,  endH: 11, endM: 30 },
+      // Last day (Thu May 21) → 10:00–11:45
+      lastDay:   { startH: 10, startM: 0,  endH: 11, endM: 45 }
     };
 
     function isWeekday(d) { const wd = d.getDay(); return wd >= 1 && wd <= 5; }
@@ -349,10 +352,16 @@
     function isLastDay(d) {
       return d.getFullYear() === 2026 && d.getMonth() === 4 && d.getDate() === 21;
     }
+    // Mon May 18 – Wed May 20 (last week before last day)
+    function isLastWeek(d) {
+      return d.getFullYear() === 2026 && d.getMonth() === 4 &&
+             d.getDate() >= 18 && d.getDate() <= 20;
+    }
 
     function schoolSchedule(d) {
-      if (isLastDay(d)) return SCHOOL.lastDay;
-      if (isThursday(d)) return SCHOOL.thursday;
+      if (isLastDay(d))   return SCHOOL.lastDay;
+      if (isLastWeek(d))  return SCHOOL.lastWeek;
+      if (isThursday(d))  return SCHOOL.thursday;
       return SCHOOL.regular;
     }
 
