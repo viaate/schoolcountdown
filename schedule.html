@@ -170,9 +170,8 @@
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: rgba(0, 22, 60, 0.97) padding-box,
-                  linear-gradient(135deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2) border-box;
-      border: 1px solid transparent;
+      background: rgba(0, 18, 50, 0.96);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 20px;
       padding: 2rem;
       width: min(360px, 90vw);
@@ -186,20 +185,17 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     }
     .modal h2 {
-      font-size: 1.2rem;
-      font-weight: 800;
+      font-size: 1.1rem;
+      font-weight: 700;
       margin-bottom: 0.25rem;
-      letter-spacing: 0.03em;
-      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      letter-spacing: 0.04em;
+      color: #fff;
     }
-    .modal .modal-sub { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-bottom: 1.25rem; }
+    .modal .modal-sub { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 1.25rem; letter-spacing: 0.02em; }
     .check-row {
       display: flex;
       align-items: center;
@@ -208,25 +204,25 @@
       border-bottom: 1px solid rgba(255,255,255,0.07);
     }
     .check-row:last-of-type { border-bottom: none; }
-    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #0277BD; cursor: pointer; flex-shrink: 0; }
-    .check-row label { font-size: 0.9rem; color: rgba(255,255,255,0.85); cursor: pointer; flex: 1; letter-spacing: 0.01em; }
+    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #fff; cursor: pointer; flex-shrink: 0; }
+    .check-row label { font-size: 0.88rem; color: rgba(255,255,255,0.75); cursor: pointer; flex: 1; }
     .modal-close {
       margin-top: 1.5rem;
       width: 100%;
-      padding: 0.75rem;
-      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
-      border: none;
+      padding: 0.7rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 10px;
       color: #fff;
-      font-size: 0.9rem;
-      font-weight: 800;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: background 0.2s;
       font-family: inherit;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-    .modal-close:hover { opacity: 0.85; }
+    .modal-close:hover { background: rgba(255,255,255,0.17); }
 
     @media (max-width: 480px) {
       .class-name { font-size: 3rem; }
