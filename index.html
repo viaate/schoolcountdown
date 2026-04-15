@@ -9,12 +9,10 @@
       --blue:      #00285E;
       --blue-mid:  #003d8f;
       --blue-light:#0055c4;
-      --gold:      #FFB81C;
-      --gold-dark: #d99800;
       --white:     #ffffff;
       --card-bg:   rgba(255,255,255,0.07);
-      --card-border:rgba(255,184,28,0.35);
       --shadow:    0 8px 32px rgba(0,0,0,0.35);
+      --rb: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,9 +41,12 @@
       font-size: clamp(1rem, 3vw, 1.25rem);
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: var(--gold);
       font-weight: 600;
       margin-bottom: 0.4rem;
+      background: var(--rb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .page-title {
@@ -57,7 +58,10 @@
     }
 
     .page-title span {
-      color: var(--gold);
+      background: var(--rb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .page-subtitle {
@@ -69,9 +73,9 @@
 
     /* ── Divider ─────────────────────────────────────── */
     .divider {
-      width: 80px;
+      width: 120px;
       height: 3px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      background: var(--rb);
       margin: 1.2rem auto;
       border-radius: 2px;
     }
@@ -87,8 +91,9 @@
 
     /* ── Card ────────────────────────────────────────── */
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,0.07) padding-box,
+                  linear-gradient(135deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2) border-box;
+      border: 1px solid transparent;
       border-radius: 20px;
       padding: 2rem 1.75rem 1.75rem;
       backdrop-filter: blur(12px);
@@ -107,7 +112,7 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      background: var(--rb);
     }
 
     .card:hover {
@@ -125,9 +130,12 @@
       font-size: 0.8rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--gold);
       font-weight: 700;
       margin-bottom: 1.2rem;
+      background: var(--rb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     /* ── Digit blocks ────────────────────────────────── */
@@ -184,10 +192,12 @@
     .big-num {
       font-size: clamp(4rem, 10vw, 6rem);
       font-weight: 900;
-      color: var(--gold);
       line-height: 1;
-      text-shadow: 0 0 30px rgba(255,184,28,0.4);
       font-variant-numeric: tabular-nums;
+      background: var(--rb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .big-unit {
@@ -208,7 +218,10 @@
     }
 
     .today-message.active {
-      color: var(--gold);
+      background: var(--rb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       font-style: normal;
       font-weight: 700;
     }
@@ -222,8 +235,8 @@
     .done-banner {
       position: absolute;
       top: 14px; right: -26px;
-      background: var(--gold);
-      color: var(--blue);
+      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
+      color: #fff;
       font-size: 0.65rem;
       font-weight: 800;
       letter-spacing: 0.1em;
@@ -257,11 +270,11 @@
     }
 
     /* pulse animation for active today card */
-    @keyframes pulse-gold {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,184,28,0); }
-      50% { box-shadow: 0 0 0 6px rgba(255,184,28,0.18); }
+    @keyframes pulse-school {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+      50% { box-shadow: 0 0 0 6px rgba(255,255,255,0.14); }
     }
-    .card.in-school { animation: pulse-gold 2.5s ease-in-out infinite; }
+    .card.in-school { animation: pulse-school 2.5s ease-in-out infinite; }
 
     /* ── Nav buttons (top-right) ────────────────────────── */
     .nav-btns {
@@ -305,31 +318,34 @@
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: rgba(0, 22, 60, 0.97);
-      border: 1px solid rgba(255,184,28,0.35);
+      background: rgba(0, 22, 60, 0.97) padding-box,
+                  linear-gradient(135deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2) border-box;
+      border: 1px solid transparent;
       border-radius: 20px;
       padding: 2rem;
       width: min(360px, 90vw);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,184,28,0.08);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
       color: #fff;
       position: relative;
       overflow: hidden;
       backdrop-filter: blur(20px);
     }
-    /* Gold top accent bar — same pattern as the cards */
     .modal::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: linear-gradient(90deg, transparent, #FFB81C, transparent);
+      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
     }
     .modal h2 {
       font-size: 1.2rem;
       font-weight: 800;
       margin-bottom: 0.25rem;
-      color: #FFB81C;
       letter-spacing: 0.03em;
+      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .modal .modal-sub { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-bottom: 1.25rem; }
     .check-row {
@@ -337,28 +353,28 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.6rem 0.25rem;
-      border-bottom: 1px solid rgba(255,184,28,0.12);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
     }
     .check-row:last-of-type { border-bottom: none; }
-    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #FFB81C; cursor: pointer; flex-shrink: 0; }
+    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #0277BD; cursor: pointer; flex-shrink: 0; }
     .check-row label { font-size: 0.9rem; color: rgba(255,255,255,0.85); cursor: pointer; flex: 1; letter-spacing: 0.01em; }
     .modal-close {
       margin-top: 1.5rem;
       width: 100%;
       padding: 0.75rem;
-      background: #FFB81C;
+      background: linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);
       border: none;
       border-radius: 10px;
-      color: #00285E;
+      color: #fff;
       font-size: 0.9rem;
       font-weight: 800;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: opacity 0.2s;
       font-family: inherit;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
-    .modal-close:hover { background: #e6a519; }
+    .modal-close:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -695,11 +711,11 @@
         cardToday.classList.add('in-school');
         html = `
           <div class="blocks" style="margin-bottom:0.5rem">
-            <div class="block"><div class="block-num" style="color:var(--gold)">${pad(h)}</div><div class="block-unit">hrs</div></div>
+            <div class="block"><div class="block-num" style="background:linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${pad(h)}</div><div class="block-unit">hrs</div></div>
             <div class="colon">:</div>
-            <div class="block"><div class="block-num" style="color:var(--gold)">${pad(m)}</div><div class="block-unit">min</div></div>
+            <div class="block"><div class="block-num" style="background:linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${pad(m)}</div><div class="block-unit">min</div></div>
             <div class="colon">:</div>
-            <div class="block"><div class="block-num" style="color:var(--gold)">${pad(sec)}</div><div class="block-unit">sec</div></div>
+            <div class="block"><div class="block-num" style="background:linear-gradient(90deg,#C62828,#E64A19,#F9A825,#2E7D32,#0277BD,#283593,#7B1FA2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${pad(sec)}</div><div class="block-unit">sec</div></div>
           </div>
           <p style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:0.4rem">Until ${td.endStr} · You're in school right now!</p>`;
       } else { // after
