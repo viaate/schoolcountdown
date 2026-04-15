@@ -30,6 +30,7 @@
       flex-direction: column;
       align-items: center;
       padding: 2rem 1rem 3rem;
+      transition: background 0.9s ease;
     }
 
     /* ── Header ─────────────────────────────────────── */
@@ -261,9 +262,107 @@
       50% { box-shadow: 0 0 0 6px rgba(255,184,28,0.18); }
     }
     .card.in-school { animation: pulse-gold 2.5s ease-in-out infinite; }
+
+    /* ── Nav buttons (top-right) ────────────────────────── */
+    .nav-btns {
+      position: fixed;
+      top: 1.1rem;
+      right: 1.1rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 200;
+    }
+    .nav-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,184,28,0.35);
+      color: var(--white);
+      border-radius: 10px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background 0.2s;
+      letter-spacing: 0.03em;
+      font-family: inherit;
+    }
+    .nav-btn:hover { background: rgba(255,184,28,0.2); }
+
+    /* ── Settings modal ─────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      width: min(360px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      color: #fff;
+    }
+    .modal h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .modal .modal-sub { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .check-row:last-of-type { border-bottom: none; }
+    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #FFB81C; cursor: pointer; flex-shrink: 0; }
+    .check-row label { font-size: 0.9rem; color: rgba(255,255,255,0.8); cursor: pointer; flex: 1; }
+    .modal-close {
+      margin-top: 1.25rem;
+      width: 100%;
+      padding: 0.7rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.15); }
   </style>
 </head>
 <body>
+
+  <!-- ── Top-right nav ──────────────────────────────────────── -->
+  <div class="nav-btns">
+    <a href="schedule.html" class="nav-btn">📚 Class Schedule</a>
+    <button class="nav-btn" onclick="openSettings()">⚙ Settings</button>
+  </div>
+
+  <!-- ── Settings modal ────────────────────────────────────── -->
+  <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeSettings()">
+    <div class="modal">
+      <h2>⚙ Settings</h2>
+      <p class="modal-sub">Check the days you have late lunch. Saved automatically.</p>
+      <div class="check-row"><input type="checkbox" id="ll-mon" onchange="saveSetting('mon',this.checked)"><label for="ll-mon">Monday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-tue" onchange="saveSetting('tue',this.checked)"><label for="ll-tue">Tuesday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-wed" onchange="saveSetting('wed',this.checked)"><label for="ll-wed">Wednesday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-thu" onchange="saveSetting('thu',this.checked)"><label for="ll-thu">Thursday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-fri" onchange="saveSetting('fri',this.checked)"><label for="ll-fri">Friday — Late Lunch</label></div>
+      <button class="modal-close" onclick="closeSettings()">Done</button>
+    </div>
+  </div>
 
   <header>
     <p class="school-name">Pembroke Hill School</p>
@@ -591,8 +690,95 @@
       todayContent.innerHTML = html;
     }
 
+    // ── Settings ─────────────────────────────────────────────────────
+    function getLateLunch() {
+      try { return JSON.parse(localStorage.getItem('phLateLunch')) || {}; } catch { return {}; }
+    }
+    function saveSetting(day, val) {
+      const s = getLateLunch(); s[day] = val;
+      localStorage.setItem('phLateLunch', JSON.stringify(s));
+    }
+    function loadSettingsUI() {
+      const s = getLateLunch();
+      ['mon','tue','wed','thu','fri'].forEach(d => {
+        const el = document.getElementById('ll-' + d);
+        if (el) el.checked = !!s[d];
+      });
+    }
+    function openSettings()  { loadSettingsUI(); document.getElementById('modal-overlay').classList.add('open'); }
+    function closeSettings() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+    // ── Dynamic background ────────────────────────────────────────────
+    const INDEX_BG = {
+      red:       'linear-gradient(145deg,#7B0000 0%,#C62828 50%,#1a0000 100%)',
+      orange:    'linear-gradient(145deg,#6D2500 0%,#E64A19 50%,#1A0500 100%)',
+      yellow:    'linear-gradient(145deg,#5D3E00 0%,#9A6200 50%,#1A1000 100%)',
+      green:     'linear-gradient(145deg,#003300 0%,#2E7D32 50%,#001500 100%)',
+      lightblue: 'linear-gradient(145deg,#002A4A 0%,#0277BD 50%,#001020 100%)',
+      royalblue: 'linear-gradient(145deg,#0D1257 0%,#283593 50%,#030825 100%)',
+      purple:    'linear-gradient(145deg,#1A0030 0%,#7B1FA2 50%,#0A0015 100%)',
+      none:      'linear-gradient(145deg,#00285E 0%,#003d8f 50%,#001f4a 100%)',
+    };
+
+    function hmI(h, m) { return h * 60 + m; }
+
+    function buildBgSchedule(dayOfWeek, lateLunch) {
+      const s = (sh,sm,eh,em,c) => ({ s:hmI(sh,sm), e:hmI(eh,em), color:c });
+      switch (dayOfWeek) {
+        case 1: {
+          const base = [s(8,45,9,30,'red'),s(9,35,10,20,'orange'),s(10,35,11,20,'yellow'),s(11,25,12,10,'green')];
+          const mid  = lateLunch ? [s(12,10,12,55,'lightblue'),s(12,55,13,40,'none')] : [s(12,10,12,55,'none'),s(12,55,13,40,'lightblue')];
+          return [...base,...mid,s(13,45,14,30,'royalblue'),s(14,35,15,20,'purple')];
+        }
+        case 2: {
+          const base = [s(8,45,10,0,'yellow'),s(10,0,10,15,'none'),s(10,15,10,45,'none'),s(10,45,12,0,'orange')];
+          const mid  = lateLunch ? [s(12,0,12,45,'red'),s(12,45,13,30,'none'),s(13,30,14,0,'red')] : [s(12,0,12,45,'none'),s(12,45,14,0,'red')];
+          return [...base,...mid,s(14,5,14,30,'none'),s(14,30,15,20,'none')];
+        }
+        case 3: {
+          const base = [s(8,45,10,0,'lightblue'),s(10,0,10,45,'none'),s(10,45,12,0,'green')];
+          const mid  = lateLunch ? [s(12,0,12,45,'purple'),s(12,45,13,30,'none'),s(13,30,14,0,'purple')] : [s(12,0,12,45,'none'),s(12,45,14,0,'purple')];
+          return [...base,...mid,s(14,5,15,20,'royalblue')];
+        }
+        case 4: {
+          const base = [s(10,0,11,15,'red'),s(11,15,11,30,'none'),s(11,30,12,0,'none')];
+          const mid  = lateLunch ? [s(12,0,12,45,'orange'),s(12,45,13,30,'none'),s(13,30,14,0,'orange')] : [s(12,0,12,45,'none'),s(12,45,14,0,'orange')];
+          return [...base,...mid,s(14,5,15,20,'yellow')];
+        }
+        case 5: {
+          const base = [s(8,45,10,0,'royalblue'),s(10,0,10,25,'none'),s(10,25,10,45,'none'),s(10,45,12,0,'purple')];
+          const mid  = lateLunch ? [s(12,0,12,45,'green'),s(12,45,13,30,'none'),s(13,30,14,0,'green')] : [s(12,0,12,45,'none'),s(12,45,14,0,'green')];
+          return [...base,...mid,s(14,5,15,20,'lightblue')];
+        }
+        default: return [];
+      }
+    }
+
+    let lastBgKey = '';
+    function updateBackground() {
+      const now = new Date();
+      const day = now.getDay();
+      let colorKey = 'none';
+      if (day >= 1 && day <= 5) {
+        const ll = getLateLunch();
+        const dk = ['','mon','tue','wed','thu','fri'][day];
+        const sched = buildBgSchedule(day, !!ll[dk]);
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+        for (const sl of sched) {
+          if (nowMin >= sl.s && nowMin < sl.e) { colorKey = sl.color; break; }
+        }
+      }
+      if (colorKey !== lastBgKey) {
+        document.body.style.background = INDEX_BG[colorKey];
+        lastBgKey = colorKey;
+      }
+    }
+
+    loadSettingsUI();
+    updateBackground();
+
     update();
-    setInterval(update, 1000);
+    setInterval(() => { update(); updateBackground(); }, 1000);
   </script>
 </body>
 </html>

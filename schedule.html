@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pembroke Hill — Class Schedule</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: #374151;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 1.5rem 3rem;
+      text-align: center;
+      transition: background-color 0.9s ease, color 0.4s ease;
+    }
+
+    /* Yellow class needs dark text */
+    body.dark-text { color: #1a1a00; }
+    body.dark-text .icon-btn { color: #1a1a00; border-color: rgba(0,0,0,0.2); background: rgba(0,0,0,0.1); }
+    body.dark-text .icon-btn:hover { background: rgba(0,0,0,0.18); }
+    body.dark-text .status-badge { background: rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.18); }
+    body.dark-text .progress-wrap { background: rgba(0,0,0,0.15); }
+    body.dark-text .progress-fill { background: rgba(0,0,0,0.45); }
+    body.dark-text .ends-at,
+    body.dark-text .next-label,
+    body.dark-text .school-label,
+    body.dark-text .sub-msg { color: rgba(0,0,0,0.55); }
+    body.dark-text .next-name { color: rgba(0,0,0,0.8); }
+
+    /* ── Fixed controls ──────────────────────────────────────── */
+    .ctrl-left, .ctrl-right {
+      position: fixed;
+      top: 1.1rem;
+      z-index: 200;
+    }
+    .ctrl-left  { left: 1.1rem; }
+    .ctrl-right { right: 1.1rem; }
+
+    .icon-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.2s, color 0.4s, border-color 0.4s;
+      font-family: inherit;
+      letter-spacing: 0.03em;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.28); }
+
+    /* ── Main content ─────────────────────────────────────────── */
+    .school-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 2.5rem;
+      font-weight: 600;
+      transition: color 0.4s;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 0.28rem 1rem;
+      margin-bottom: 0.7rem;
+      font-weight: 700;
+      transition: background 0.4s, border-color 0.4s;
+    }
+
+    .class-name {
+      font-size: clamp(3rem, 12vw, 6.5rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+      text-shadow: 0 2px 30px rgba(0,0,0,0.2);
+    }
+
+    .time-remaining {
+      font-size: clamp(2.8rem, 10vw, 5.5rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      margin: 0.4rem 0 1rem;
+    }
+
+    .ends-at {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 1rem;
+      transition: color 0.4s;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      width: min(360px, 80vw);
+      margin: 0 auto 2.2rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      height: 5px;
+      overflow: hidden;
+      transition: background 0.4s;
+    }
+    .progress-fill {
+      height: 100%;
+      background: rgba(255,255,255,0.7);
+      border-radius: 4px;
+      transition: width 1s linear, background 0.4s;
+    }
+
+    .next-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 0.25rem;
+      font-weight: 700;
+      transition: color 0.4s;
+    }
+    .next-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      transition: color 0.4s;
+    }
+
+    /* Big message (weekends, after school, summer) */
+    .big-msg {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .sub-msg {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.55);
+      margin-top: 1rem;
+      transition: color 0.4s;
+    }
+
+    /* ── Settings Modal ──────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      width: min(360px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      color: #fff;
+    }
+    .modal h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .modal .modal-sub { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .check-row:last-of-type { border-bottom: none; }
+    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #FFB81C; cursor: pointer; flex-shrink: 0; }
+    .check-row label { font-size: 0.9rem; color: rgba(255,255,255,0.8); cursor: pointer; flex: 1; }
+    .modal-close {
+      margin-top: 1.25rem;
+      width: 100%;
+      padding: 0.7rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.15); }
+
+    @media (max-width: 480px) {
+      .class-name { font-size: 3rem; }
+      .time-remaining { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body id="body">
+
+  <div class="ctrl-left">
+    <a href="index.html" class="icon-btn">← Countdown</a>
+  </div>
+  <div class="ctrl-right">
+    <button class="icon-btn" onclick="openSettings()">⚙ Settings</button>
+  </div>
+
+  <div id="main"></div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeSettings()">
+    <div class="modal">
+      <h2>⚙ Settings</h2>
+      <p class="modal-sub">Check the days you have late lunch. Saved automatically.</p>
+      <div class="check-row"><input type="checkbox" id="ll-mon" onchange="saveSetting('mon',this.checked)"><label for="ll-mon">Monday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-tue" onchange="saveSetting('tue',this.checked)"><label for="ll-tue">Tuesday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-wed" onchange="saveSetting('wed',this.checked)"><label for="ll-wed">Wednesday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-thu" onchange="saveSetting('thu',this.checked)"><label for="ll-thu">Thursday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-fri" onchange="saveSetting('fri',this.checked)"><label for="ll-fri">Friday — Late Lunch</label></div>
+      <button class="modal-close" onclick="closeSettings()">Done</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Color palette ─────────────────────────────────────────────────
+    const CLASS_COLORS = {
+      red:       { name: 'Red',        bg: '#C62828', darkText: false },
+      orange:    { name: 'Orange',     bg: '#E64A19', darkText: false },
+      yellow:    { name: 'Yellow',     bg: '#F9A825', darkText: true  },
+      green:     { name: 'Green',      bg: '#2E7D32', darkText: false },
+      lightblue: { name: 'Light Blue', bg: '#0277BD', darkText: false },
+      royalblue: { name: 'Royal Blue', bg: '#283593', darkText: false },
+      purple:    { name: 'Purple',     bg: '#7B1FA2', darkText: false },
+      none:      { name: '',           bg: '#374151', darkText: false },
+    };
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    function hm(h, m) { return h * 60 + m; }
+    function pad(n)   { return String(n).padStart(2, '0'); }
+
+    function fmtMin(totalMin) {
+      const h    = Math.floor(totalMin / 60) % 12 || 12;
+      const m    = totalMin % 60;
+      const ampm = Math.floor(totalMin / 60) < 12 ? 'AM' : 'PM';
+      return `${h}:${pad(m)} ${ampm}`;
+    }
+
+    function secToDisplay(s) {
+      const h   = Math.floor(s / 3600);
+      const m   = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+    }
+
+    // ── Schedule builder ──────────────────────────────────────────────
+    // Each slot: { s, e (minutes since midnight), color, label }
+    function buildSchedule(dayOfWeek, lateLunch) {
+      const sl = (sh, sm, eh, em, color, label) =>
+        ({ s: hm(sh,sm), e: hm(eh,em), color, label });
+
+      switch (dayOfWeek) {
+
+        case 1: { // Monday
+          const base = [
+            sl(8,45, 9,30,  'red',       'Red'),
+            sl(9,35, 10,20, 'orange',    'Orange'),
+            sl(10,35,11,20, 'yellow',    'Yellow'),
+            sl(11,25,12,10, 'green',     'Green'),
+          ];
+          const mid = lateLunch
+            ? [sl(12,10,12,55,'lightblue','Light Blue'), sl(12,55,13,40,'none','Lunch')]
+            : [sl(12,10,12,55,'none','Lunch'),           sl(12,55,13,40,'lightblue','Light Blue')];
+          return [...base, ...mid,
+            sl(13,45,14,30,'royalblue','Royal Blue'),
+            sl(14,35,15,20,'purple',   'Purple'),
+          ];
+        }
+
+        case 2: { // Tuesday
+          const base = [
+            sl(8,45, 10,0,  'yellow', 'Yellow'),
+            sl(10,0, 10,15, 'none',   'Morning Meeting'),
+            sl(10,15,10,45, 'none',   'Meetings Period'),
+            sl(10,45,12,0,  'orange', 'Orange'),
+          ];
+          const mid = lateLunch
+            ? [sl(12,0,12,45,'red','Red'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'red','Red')]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'red','Red')];
+          return [...base, ...mid,
+            sl(14,5, 14,30,'none','Advisory'),
+            sl(14,30,15,20,'none','Raider Hour'),
+          ];
+        }
+
+        case 3: { // Wednesday
+          const base = [
+            sl(8,45, 10,0,  'lightblue','Light Blue'),
+            sl(10,0, 10,45, 'none',     'Meetings Period'),
+            sl(10,45,12,0,  'green',    'Green'),
+          ];
+          const mid = lateLunch
+            ? [sl(12,0,12,45,'purple','Purple'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'purple','Purple')]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'purple','Purple')];
+          return [...base, ...mid,
+            sl(14,5,15,20,'royalblue','Royal Blue'),
+          ];
+        }
+
+        case 4: { // Thursday
+          const base = [
+            sl(10,0, 11,15,'red',  'Red'),
+            sl(11,15,11,30,'none', 'Morning Meetings'),
+            sl(11,30,12,0, 'none', 'Meetings Period'),
+          ];
+          const mid = lateLunch
+            ? [sl(12,0,12,45,'orange','Orange'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'orange','Orange')]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'orange','Orange')];
+          return [...base, ...mid,
+            sl(14,5,15,20,'yellow','Yellow'),
+          ];
+        }
+
+        case 5: { // Friday
+          const base = [
+            sl(8,45, 10,0,  'royalblue','Royal Blue'),
+            sl(10,0, 10,25, 'none',     'Advisory'),
+            sl(10,25,10,45, 'none',     'Meetings Period'),
+            sl(10,45,12,0,  'purple',   'Purple'),
+          ];
+          const mid = lateLunch
+            ? [sl(12,0,12,45,'green','Green'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'green','Green')]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'green','Green')];
+          return [...base, ...mid,
+            sl(14,5,15,20,'lightblue','Light Blue'),
+          ];
+        }
+
+        default: return [];
+      }
+    }
+
+    // ── Settings ──────────────────────────────────────────────────────
+    function getLateLunch() {
+      try { return JSON.parse(localStorage.getItem('phLateLunch')) || {}; } catch { return {}; }
+    }
+    function saveSetting(day, val) {
+      const s = getLateLunch(); s[day] = val;
+      localStorage.setItem('phLateLunch', JSON.stringify(s));
+    }
+    function loadSettingsUI() {
+      const s = getLateLunch();
+      ['mon','tue','wed','thu','fri'].forEach(d => {
+        const el = document.getElementById('ll-' + d);
+        if (el) el.checked = !!s[d];
+      });
+    }
+    function openSettings()  { loadSettingsUI(); document.getElementById('modal-overlay').classList.add('open'); }
+    function closeSettings() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+    // ── Current state ─────────────────────────────────────────────────
+    const LAST_DAY_END = new Date(2026, 4, 21, 11, 45, 0);
+    const DAY_NAMES    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+    function getCurrentState(now) {
+      if (now >= LAST_DAY_END) return { type: 'summer' };
+
+      const day = now.getDay();
+      if (day === 0 || day === 6) return { type: 'weekend' };
+
+      // May 18 2026 — no school
+      if (now.getFullYear()===2026 && now.getMonth()===4 && now.getDate()===18)
+        return { type: 'noschool' };
+
+      const ll       = getLateLunch();
+      const dk       = ['','mon','tue','wed','thu','fri'][day];
+      const schedule = buildSchedule(day, !!ll[dk]);
+      const nowMin   = now.getHours() * 60 + now.getMinutes();
+
+      // Find current slot
+      let curIdx = -1;
+      for (let i = 0; i < schedule.length; i++) {
+        if (nowMin >= schedule[i].s && nowMin < schedule[i].e) { curIdx = i; break; }
+      }
+
+      // Next upcoming class (color !== 'none')
+      function nextClassAfter(idx) {
+        for (let i = idx + 1; i < schedule.length; i++)
+          if (schedule[i].color !== 'none') return schedule[i];
+        return null;
+      }
+      // Next slot of any kind
+      function nextSlotAfter(idx) {
+        return idx + 1 < schedule.length ? schedule[idx + 1] : null;
+      }
+
+      if (curIdx === -1) {
+        const firstSlot = schedule[0];
+        if (!firstSlot || nowMin < firstSlot.s) {
+          return { type: 'before', nextClass: schedule.find(s => s.color !== 'none') };
+        }
+        const nextSlot = schedule.find(s => s.s > nowMin);
+        if (!nextSlot) return { type: 'after' };
+        return { type: 'passing', nextSlot };
+      }
+
+      const slot    = schedule[curIdx];
+      const nowSec  = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const endSec  = slot.e * 60;
+      const secLeft = Math.max(0, endSec - nowSec);
+      const totalSec= (slot.e - slot.s) * 60;
+      const progress= 1 - secLeft / totalSec;
+
+      return {
+        type: 'in',
+        slot,
+        secLeft,
+        progress,
+        nextClass: nextClassAfter(curIdx),
+        nextSlot:  nextSlotAfter(curIdx),
+      };
+    }
+
+    // ── Render ────────────────────────────────────────────────────────
+    let lastBg = '';
+
+    function update() {
+      const now   = new Date();
+      const state = getCurrentState(now);
+      const today = DAY_NAMES[now.getDay()];
+      const main  = document.getElementById('main');
+      const body  = document.body;
+
+      // Determine background key
+      let bgKey = 'none';
+      if (state.type === 'in') bgKey = state.slot.color;
+
+      // Apply background + text color
+      const cInfo = CLASS_COLORS[bgKey] || CLASS_COLORS.none;
+      if (cInfo.bg !== lastBg) {
+        body.style.backgroundColor = cInfo.bg;
+        lastBg = cInfo.bg;
+      }
+      body.classList.toggle('dark-text', cInfo.darkText);
+
+      // Build HTML
+      let html = '';
+
+      if (state.type === 'summer') {
+        html = `<div class="school-label">Pembroke Hill School</div>
+                <div class="big-msg">School's out<br>for summer! 🎉</div>`;
+
+      } else if (state.type === 'weekend') {
+        html = `<div class="school-label">Pembroke Hill School</div>
+                <div class="big-msg" style="font-size:2.8rem">Enjoy your weekend!</div>
+                <div class="sub-msg">No school today.</div>`;
+
+      } else if (state.type === 'noschool') {
+        html = `<div class="school-label">Pembroke Hill School</div>
+                <div class="big-msg" style="font-size:2.8rem">No school today!</div>
+                <div class="sub-msg">Monday, May 18</div>`;
+
+      } else if (state.type === 'before') {
+        const nc = state.nextClass;
+        html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+                <div class="status-badge">Before School</div>
+                <div class="class-name" style="font-size:2.5rem">School starts soon</div>
+                ${nc ? `<div class="sub-msg">First up: <strong>${nc.label}</strong> at ${fmtMin(nc.s)}</div>` : ''}`;
+
+      } else if (state.type === 'after') {
+        html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+                <div class="big-msg" style="font-size:2.8rem">School's done<br>for today!</div>`;
+
+      } else if (state.type === 'passing') {
+        const ns = state.nextSlot;
+        html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+                <div class="status-badge">Passing Period</div>
+                <div class="class-name" style="font-size:2.5rem">Between Classes</div>
+                ${ns ? `<div class="sub-msg" style="margin-top:1rem">Up next: <strong>${ns.label}</strong> at ${fmtMin(ns.s)}</div>` : ''}`;
+
+      } else { // 'in'
+        const slot    = state.slot;
+        const isClass = slot.color !== 'none';
+        const endsAt  = fmtMin(slot.e);
+
+        const nextHtml = state.nextClass
+          ? `<div class="next-label">Up next</div>
+             <div class="next-name">${state.nextClass.label} &nbsp;·&nbsp; ${fmtMin(state.nextClass.s)}</div>`
+          : `<div class="next-label">Last class of the day</div>`;
+
+        html = `
+          <div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+          <div class="status-badge">${isClass ? 'Now in Class' : slot.label}</div>
+          <div class="class-name">${isClass ? slot.label : ''}</div>
+          <div class="time-remaining">${secToDisplay(state.secLeft)}</div>
+          <div class="ends-at">Ends at ${endsAt}</div>
+          <div class="progress-wrap">
+            <div class="progress-fill" style="width:${Math.round(state.progress * 100)}%"></div>
+          </div>
+          ${nextHtml}`;
+      }
+
+      main.innerHTML = html;
+    }
+
+    loadSettingsUI();
+    update();
+    setInterval(update, 1000);
+  </script>
+</body>
+</html>
