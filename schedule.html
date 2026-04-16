@@ -497,7 +497,7 @@
         const nc = state.nextClass;
         html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
                 <div class="status-badge">Before School</div>
-                <div class="class-name">School starts soon</div>
+                <div class="class-name" style="font-size:clamp(1.8rem,5vw,2.8rem)">School starts soon</div>
                 ${nc ? `<div class="sub-msg">First up: <strong>${nc.label}</strong> at ${fmtMin(nc.s)}</div>` : ''}`;
 
       } else if (state.type === 'after') {
