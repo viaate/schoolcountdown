@@ -28,6 +28,7 @@
       flex-direction: column;
       align-items: center;
       padding: 2rem 1rem 3rem;
+      transition: background 0.9s ease;
     }
 
     /* ── Header ────────────────────────────────────────── */
@@ -251,6 +252,138 @@
       letter-spacing: 0.06em;
     }
 
+    /* ── Search ─────────────────────────────────────────── */
+    .search-section {
+      width: 100%;
+      max-width: 640px;
+      margin-top: 1.75rem;
+    }
+
+    .search-title {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-wrap {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .search-input {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      padding: 0.6rem 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.3); }
+    .search-input:focus {
+      border-color: rgba(255,184,28,0.5);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .search-clear {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+      border-radius: 10px;
+      padding: 0.6rem 0.85rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+      line-height: 1;
+    }
+    .search-clear:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+    .search-results {
+      margin-top: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .search-empty {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.9rem;
+      padding: 1.25rem 0;
+    }
+
+    .result-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 0.85rem 1.1rem;
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .result-card:hover { background: rgba(255,255,255,0.11); }
+    .result-card.is-past { opacity: 0.45; }
+    .result-card.is-today { border-color: rgba(255,184,28,0.5); }
+
+    .result-date-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .result-date {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .result-badge {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      background: rgba(255,184,28,0.25);
+      border: 1px solid rgba(255,184,28,0.45);
+      color: #fff;
+    }
+    .result-badge.next { background: rgba(100,255,130,0.18); border-color: rgba(100,255,130,0.4); }
+
+    .result-matches { display: flex; flex-direction: column; gap: 0.2rem; }
+    .result-match {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.85);
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+    .result-match mark {
+      background: rgba(255,184,28,0.35);
+      color: #fff;
+      border-radius: 3px;
+      padding: 0 2px;
+    }
+    .result-section-tag {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.35);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
     @media (max-width: 480px) {
       .menu-card { padding: 1.5rem 1.25rem; }
     }
@@ -275,6 +408,18 @@
     <div class="week-nav" id="week-nav"></div>
     <div class="menu-card" id="menu-card"></div>
     <p class="no-data-note" id="no-data-note"></p>
+  </div>
+
+  <!-- Search -->
+  <div class="search-section">
+    <div class="search-title">&#128269; Find a Menu Item</div>
+    <div class="search-wrap">
+      <input class="search-input" id="search-input" type="text"
+             placeholder="e.g. pizza, chicken, broccoli…"
+             oninput="doSearch(this.value)" autocomplete="off" spellcheck="false" />
+      <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear">&#x2715;</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
   </div>
 
   <footer>Ward Parkway Campus &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; 2025–2026</footer>
@@ -536,7 +681,155 @@
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    // ── Background: match current class color ─────────────────────────
+    const BG_GRADIENTS = {
+      red:       'linear-gradient(145deg,#7B0000 0%,#C62828 50%,#1a0000 100%)',
+      orange:    'linear-gradient(145deg,#6D2500 0%,#E64A19 50%,#1A0500 100%)',
+      yellow:    'linear-gradient(145deg,#5D3E00 0%,#9A6200 50%,#1A1000 100%)',
+      green:     'linear-gradient(145deg,#003300 0%,#2E7D32 50%,#001500 100%)',
+      lightblue: 'linear-gradient(145deg,#002A4A 0%,#0277BD 50%,#001020 100%)',
+      royalblue: 'linear-gradient(145deg,#0D1257 0%,#283593 50%,#030825 100%)',
+      purple:    'linear-gradient(145deg,#1A0030 0%,#7B1FA2 50%,#0A0015 100%)',
+      none:      'linear-gradient(145deg,#00285E 0%,#003d8f 50%,#001f4a 100%)',
+    };
+
+    function getLateLunch() {
+      try { return JSON.parse(localStorage.getItem('phLateLunch')) || {}; } catch { return {}; }
+    }
+
+    function hmI(h, m) { return h * 60 + m; }
+
+    function buildBgSchedule(dayOfWeek, lateLunch) {
+      const s = (sh,sm,eh,em,c) => ({ s:hmI(sh,sm), e:hmI(eh,em), color:c });
+      switch (dayOfWeek) {
+        case 1: {
+          const base = [s(8,45,9,30,'red'),s(9,35,10,20,'orange'),s(10,35,11,20,'yellow'),s(11,25,12,10,'green')];
+          const mid  = lateLunch ? [s(12,10,12,55,'lightblue'),s(12,55,13,40,'none')] : [s(12,10,12,55,'none'),s(12,55,13,40,'lightblue')];
+          return [...base,...mid,s(13,45,14,30,'royalblue'),s(14,35,15,20,'purple')];
+        }
+        case 2: {
+          const base = [s(8,45,10,0,'yellow'),s(10,0,10,15,'none'),s(10,15,10,45,'none'),s(10,45,12,0,'orange')];
+          const mid  = lateLunch ? [s(12,0,12,45,'red'),s(12,45,13,30,'none'),s(13,30,14,0,'red')] : [s(12,0,12,45,'none'),s(12,45,14,0,'red')];
+          return [...base,...mid,s(14,5,14,30,'none'),s(14,30,15,20,'none')];
+        }
+        case 3: {
+          const base = [s(8,45,10,0,'lightblue'),s(10,0,10,45,'none'),s(10,45,12,0,'green')];
+          const mid  = lateLunch ? [s(12,0,12,45,'purple'),s(12,45,13,30,'none'),s(13,30,14,0,'purple')] : [s(12,0,12,45,'none'),s(12,45,14,0,'purple')];
+          return [...base,...mid,s(14,5,15,20,'royalblue')];
+        }
+        case 4: {
+          const base = [s(10,0,11,15,'red'),s(11,15,11,30,'none'),s(11,30,12,0,'none')];
+          const mid  = lateLunch ? [s(12,0,12,45,'orange'),s(12,45,13,30,'none'),s(13,30,14,0,'orange')] : [s(12,0,12,45,'none'),s(12,45,14,0,'orange')];
+          return [...base,...mid,s(14,5,15,20,'yellow')];
+        }
+        case 5: {
+          const base = [s(8,45,10,0,'royalblue'),s(10,0,10,25,'none'),s(10,25,10,45,'none'),s(10,45,12,0,'purple')];
+          const mid  = lateLunch ? [s(12,0,12,45,'green'),s(12,45,13,30,'none'),s(13,30,14,0,'green')] : [s(12,0,12,45,'none'),s(12,45,14,0,'green')];
+          return [...base,...mid,s(14,5,15,20,'lightblue')];
+        }
+        default: return [];
+      }
+    }
+
+    let lastBgKey = '';
+    function updateBackground() {
+      const now = new Date();
+      const day = now.getDay();
+      let colorKey = 'none';
+      if (day >= 1 && day <= 5) {
+        const ll = getLateLunch();
+        const dk = ['','mon','tue','wed','thu','fri'][day];
+        const sched = buildBgSchedule(day, !!ll[dk]);
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+        for (const sl of sched) {
+          if (nowMin >= sl.s && nowMin < sl.e && sl.color !== 'none') { colorKey = sl.color; break; }
+        }
+      }
+      if (colorKey !== lastBgKey) {
+        document.body.style.background = BG_GRADIENTS[colorKey];
+        lastBgKey = colorKey;
+      }
+    }
+
+    // ── Search ────────────────────────────────────────────────────────
+    function highlightMatch(text, query) {
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return escHtml(text);
+      return escHtml(text.slice(0, idx)) +
+             `<mark>${escHtml(text.slice(idx, idx + query.length))}</mark>` +
+             escHtml(text.slice(idx + query.length));
+    }
+
+    function doSearch(query) {
+      const q = query.trim();
+      const resultsEl = document.getElementById('search-results');
+      if (!q) { resultsEl.innerHTML = ''; return; }
+
+      const today = new Date(); today.setHours(0,0,0,0);
+      const results = [];
+
+      for (const [key, menu] of Object.entries(MENU)) {
+        const [yr, mo, dy] = key.split('-').map(Number);
+        const date = new Date(yr, mo - 1, dy);
+        const hits = [];
+
+        [['Main', menu.main], ["Bowl'd", menu.bowl], ['Soup', menu.soup]].forEach(([sec, items]) => {
+          items.forEach(item => {
+            if (item.toLowerCase().includes(q.toLowerCase()))
+              hits.push({ sec, item });
+          });
+        });
+
+        if (hits.length) results.push({ date, key, hits });
+      }
+
+      results.sort((a, b) => a.date - b.date);
+
+      if (!results.length) {
+        resultsEl.innerHTML = `<p class="search-empty">Nothing found for "<strong>${escHtml(q)}</strong>"</p>`;
+        return;
+      }
+
+      // Find the first upcoming result to badge it "next"
+      const firstUpcoming = results.find(r => r.date >= today);
+
+      resultsEl.innerHTML = results.map(r => {
+        const isPast    = r.date < today;
+        const isToday   = r.date.toDateString() === today.toDateString();
+        const isNext    = !isPast && r === firstUpcoming && !isToday;
+        let badge = '';
+        if (isToday) badge = '<span class="result-badge">Today</span>';
+        else if (isNext) badge = '<span class="result-badge next">Next</span>';
+
+        const matchHtml = r.hits.map(h =>
+          `<div class="result-match">
+            <span class="result-section-tag">${escHtml(h.sec)}</span>
+            ${highlightMatch(h.item, q)}
+          </div>`
+        ).join('');
+
+        return `<div class="result-card${isPast?' is-past':''}${isToday?' is-today':''}"
+                     onclick="render(new Date(${r.date.getFullYear()},${r.date.getMonth()},${r.date.getDate()}));
+                              document.getElementById('search-input').blur();
+                              window.scrollTo({top:0,behavior:'smooth'})">
+          <div class="result-date-row">
+            <span class="result-date">${friendlyDate(r.date)}</span>${badge}
+          </div>
+          <div class="result-matches">${matchHtml}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function clearSearch() {
+      const inp = document.getElementById('search-input');
+      inp.value = '';
+      document.getElementById('search-results').innerHTML = '';
+      inp.focus();
+    }
+
     render(new Date());
+    updateBackground();
+    setInterval(updateBackground, 10000);
   </script>
 </body>
 </html>
