@@ -372,6 +372,81 @@
       flex-shrink: 0;
     }
 
+    /* ── Menu item readability ───────────────────────────── */
+    .menu-items li {
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+    .section-label {
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    }
+    .result-match {
+      text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+    }
+    .result-date {
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    }
+
+    /* ── Settings modal ─────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: rgba(0,18,50,0.96);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      width: min(360px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+    }
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+    .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: 0.04em; }
+    .modal .modal-sub { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 1.25rem; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .check-row:last-of-type { border-bottom: none; }
+    .check-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #fff; cursor: pointer; flex-shrink: 0; }
+    .check-row label { font-size: 0.88rem; color: rgba(255,255,255,0.75); cursor: pointer; flex: 1; }
+    .modal-close {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.7rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.17); }
+
     @media (max-width: 480px) {
       .menu-card { padding: 1.5rem 1.25rem; }
     }
@@ -383,6 +458,21 @@
   <div class="nav-btns">
     <a href="index.html" class="nav-btn">&#8592; Countdown</a>
     <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
+    <button class="nav-btn" onclick="openSettings()">&#9881; Settings</button>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeSettings()">
+    <div class="modal">
+      <h2>&#9881; Settings</h2>
+      <p class="modal-sub">Check the days you have late lunch. Saved automatically.</p>
+      <div class="check-row"><input type="checkbox" id="ll-mon" onchange="saveSetting('mon',this.checked)"><label for="ll-mon">Monday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-tue" onchange="saveSetting('tue',this.checked)"><label for="ll-tue">Tuesday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-wed" onchange="saveSetting('wed',this.checked)"><label for="ll-wed">Wednesday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-thu" onchange="saveSetting('thu',this.checked)"><label for="ll-thu">Thursday — Late Lunch</label></div>
+      <div class="check-row"><input type="checkbox" id="ll-fri" onchange="saveSetting('fri',this.checked)"><label for="ll-fri">Friday — Late Lunch</label></div>
+      <button class="modal-close" onclick="closeSettings()">Done</button>
+    </div>
   </div>
 
   <header>
@@ -395,10 +485,10 @@
   <div class="content">
     <!-- Search -->
     <div class="search-section">
-      <div class="search-title">&#128269; Find a Menu Item</div>
+      <div class="search-title">Find a Menu Item</div>
       <div class="search-wrap">
         <input class="search-input" id="search-input" type="text"
-               placeholder="e.g. pizza, chicken, broccoli…"
+               placeholder="e.g. pizza, monday, may, chicken…"
                oninput="doSearch(this.value)" autocomplete="off" spellcheck="false" />
         <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear">&#x2715;</button>
       </div>
@@ -684,6 +774,19 @@
     function getLateLunch() {
       try { return JSON.parse(localStorage.getItem('phLateLunch')) || {}; } catch { return {}; }
     }
+    function saveSetting(day, val) {
+      const s = getLateLunch(); s[day] = val;
+      localStorage.setItem('phLateLunch', JSON.stringify(s));
+    }
+    function loadSettingsUI() {
+      const s = getLateLunch();
+      ['mon','tue','wed','thu','fri'].forEach(d => {
+        const el = document.getElementById('ll-' + d);
+        if (el) el.checked = !!s[d];
+      });
+    }
+    function openSettings()  { loadSettingsUI(); document.getElementById('modal-overlay').classList.add('open'); }
+    function closeSettings() { document.getElementById('modal-overlay').classList.remove('open'); }
 
     function hmI(h, m) { return h * 60 + m; }
 
@@ -749,7 +852,8 @@
     }
 
     function doSearch(query) {
-      const q = query.trim();
+      const q   = query.trim();
+      const ql  = q.toLowerCase();
       const resultsEl = document.getElementById('search-results');
       if (!q) { resultsEl.innerHTML = ''; return; }
 
@@ -758,17 +862,27 @@
 
       for (const [key, menu] of Object.entries(MENU)) {
         const [yr, mo, dy] = key.split('-').map(Number);
-        const date = new Date(yr, mo - 1, dy);
-        const hits = [];
+        const date     = new Date(yr, mo - 1, dy);
+        const dayName  = DAY_NAMES[date.getDay()].toLowerCase();
+        const monName  = MON_NAMES[date.getMonth()].toLowerCase();
+        const monShort = monName.slice(0, 3);
+        const fullStr  = friendlyDate(date).toLowerCase();
 
+        const dateMatch =
+          dayName.startsWith(ql) ||
+          monName.startsWith(ql) ||
+          monShort.startsWith(ql) ||
+          String(dy) === ql ||
+          fullStr.includes(ql);
+
+        const hits = [];
         [['Main', menu.main], ["Bowl'd", menu.bowl], ['Soup', menu.soup]].forEach(([sec, items]) => {
           items.forEach(item => {
-            if (item.toLowerCase().includes(q.toLowerCase()))
-              hits.push({ sec, item });
+            if (item.toLowerCase().includes(ql)) hits.push({ sec, item });
           });
         });
 
-        if (hits.length) results.push({ date, key, hits });
+        if (hits.length || dateMatch) results.push({ date, key, hits, dateMatch: dateMatch && !hits.length });
       }
 
       results.sort((a, b) => a.date - b.date);
@@ -778,23 +892,29 @@
         return;
       }
 
-      // Find the first upcoming result to badge it "next"
       const firstUpcoming = results.find(r => r.date >= today);
 
       resultsEl.innerHTML = results.map(r => {
-        const isPast    = r.date < today;
-        const isToday   = r.date.toDateString() === today.toDateString();
-        const isNext    = !isPast && r === firstUpcoming && !isToday;
+        const isPast  = r.date < today;
+        const isToday = r.date.toDateString() === today.toDateString();
+        const isNext  = !isPast && r === firstUpcoming && !isToday;
         let badge = '';
         if (isToday) badge = '<span class="result-badge">Today</span>';
         else if (isNext) badge = '<span class="result-badge next">Next</span>';
 
-        const matchHtml = r.hits.map(h =>
-          `<div class="result-match">
-            <span class="result-section-tag">${escHtml(h.sec)}</span>
-            ${highlightMatch(h.item, q)}
-          </div>`
-        ).join('');
+        let matchHtml;
+        if (r.dateMatch) {
+          const m = MENU[r.key];
+          matchHtml = [['Main', m.main], ["Bowl'd", m.bowl], ['Soup', m.soup]].map(([sec, items]) =>
+            items.map(item =>
+              `<div class="result-match"><span class="result-section-tag">${escHtml(sec)}</span>${escHtml(item)}</div>`
+            ).join('')
+          ).join('');
+        } else {
+          matchHtml = r.hits.map(h =>
+            `<div class="result-match"><span class="result-section-tag">${escHtml(h.sec)}</span>${highlightMatch(h.item, q)}</div>`
+          ).join('');
+        }
 
         return `<div class="result-card${isPast?' is-past':''}${isToday?' is-today':''}"
                      onclick="render(new Date(${r.date.getFullYear()},${r.date.getMonth()},${r.date.getDate()}));
@@ -815,6 +935,7 @@
       inp.focus();
     }
 
+    loadSettingsUI();
     render(new Date());
     updateBackground();
     setInterval(updateBackground, 10000);
