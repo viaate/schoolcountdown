@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raider Hub | Grades</title>
+  <style>
+    :root {
+      --blue:   #00285E;
+      --white:  #ffffff;
+      --accent: rgba(255,255,255,0.65);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--blue);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+      transition: background-color 0.9s ease;
+    }
+
+    /* ── Nav ─────────────────────────────────────────────── */
+    .nav-btns {
+      position: fixed;
+      top: 1.1rem;
+      right: 1.1rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 200;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: var(--white);
+      border-radius: 10px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.2s;
+      letter-spacing: 0.03em;
+      font-family: inherit;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.28); }
+
+    /* ── Header ──────────────────────────────────────────── */
+    header { text-align: center; margin-bottom: 1.75rem; margin-top: 1rem; }
+    .school-name {
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--accent);
+    }
+    .page-title {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    .divider {
+      width: 80px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      margin: 1rem auto;
+    }
+
+    /* ── Tabs ────────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.55);
+      border-radius: 10px;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.15s, border-color 0.15s;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+    }
+    .tab.active {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.4);
+      color: #fff;
+    }
+    .tab:hover:not(.active) { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); }
+
+    /* ── Content area ────────────────────────────────────── */
+    .content { width: 100%; max-width: 640px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Card ────────────────────────────────────────────── */
+    .calc-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 20px;
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ── GPA display ─────────────────────────────────────── */
+    .gpa-display { text-align: center; margin-bottom: 1.5rem; }
+    .gpa-num {
+      font-size: clamp(3.5rem, 11vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.65), 0 0 50px rgba(0,0,0,0.3);
+    }
+    .gpa-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-top: 0.3rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    }
+
+    /* ── Course rows ─────────────────────────────────────── */
+    .courses-header {
+      display: grid;
+      grid-template-columns: 1fr 100px 76px 34px;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .col-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      font-weight: 700;
+      padding-left: 0.25rem;
+    }
+    .course-row {
+      display: grid;
+      grid-template-columns: 1fr 100px 76px 34px;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+      align-items: center;
+    }
+
+    /* ── Inputs ──────────────────────────────────────────── */
+    .inp, .sel {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 0.5rem 0.6rem;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .inp::placeholder { color: rgba(255,255,255,0.28); }
+    .inp:focus, .sel:focus {
+      border-color: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.13);
+    }
+    .sel option { background: #002050; color: #fff; }
+
+    .remove-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.45);
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+    .remove-btn:hover {
+      background: rgba(255,80,80,0.2);
+      color: #ff8080;
+      border-color: rgba(255,80,80,0.3);
+    }
+
+    .add-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.75);
+      border-radius: 10px;
+      padding: 0.55rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.15s;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+      display: block;
+      width: 100%;
+      margin-top: 0.75rem;
+    }
+    .add-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+    /* ── Final grade section ─────────────────────────────── */
+    .section-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .fg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1rem;
+    }
+    .fg-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .fg-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ── Result display ──────────────────────────────────── */
+    .result-area { text-align: center; padding: 1.2rem 0 0.25rem; }
+    .result-num {
+      font-size: clamp(2.8rem, 9vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.65), 0 0 50px rgba(0,0,0,0.3);
+    }
+    .result-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-top: 0.25rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    }
+    .result-note {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 500px) {
+      .courses-header,
+      .course-row { grid-template-columns: 1fr 88px 68px 30px; }
+      .fg-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-btns">
+    <a href="index.html" class="nav-btn">&#8592; Countdown</a>
+    <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
+    <a href="lunch.html" class="nav-btn">&#127869; Lunch</a>
+  </div>
+
+  <header>
+    <p class="school-name">Raider Hub</p>
+    <h1 class="page-title">Grade Tools</h1>
+    <div class="divider"></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('gpa', this)">GPA Calculator</button>
+    <button class="tab" onclick="switchTab('final', this)">Final Grade</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ── GPA Panel ──────────────────────────────────────── -->
+    <div class="panel active" id="panel-gpa">
+      <div class="calc-card">
+        <div class="gpa-display">
+          <div class="gpa-num" id="gpa-num">&#8212;</div>
+          <div class="gpa-label">Cumulative GPA</div>
+        </div>
+
+        <div class="courses-header">
+          <div class="col-label">Course</div>
+          <div class="col-label">Grade</div>
+          <div class="col-label">Credits</div>
+          <div class="col-label"></div>
+        </div>
+
+        <div id="courses-list"></div>
+        <button class="add-btn" onclick="addCourse()">+ Add Course</button>
+      </div>
+    </div>
+
+    <!-- ── Final Grade Panel ──────────────────────────────── -->
+    <div class="panel" id="panel-final">
+
+      <div class="calc-card">
+        <div class="section-title">What do I need on the final?</div>
+        <div class="fg-grid">
+          <div class="fg-field">
+            <label class="fg-label" for="fn-current">Current Grade (%)</label>
+            <input class="inp" id="fn-current" type="number" min="0" max="100" step="0.1"
+                   placeholder="e.g. 88" oninput="calcNeeded()">
+          </div>
+          <div class="fg-field">
+            <label class="fg-label" for="fn-weight">Final Exam Weight (%)</label>
+            <input class="inp" id="fn-weight" type="number" min="1" max="99" step="1"
+                   placeholder="e.g. 20" oninput="calcNeeded()">
+          </div>
+          <div class="fg-field">
+            <label class="fg-label" for="fn-target">Target Grade (%)</label>
+            <input class="inp" id="fn-target" type="number" min="0" max="100" step="0.1"
+                   placeholder="e.g. 90" oninput="calcNeeded()">
+          </div>
+        </div>
+        <div class="result-area" id="fn-result"></div>
+      </div>
+
+      <div class="calc-card">
+        <div class="section-title">What will my grade be?</div>
+        <div class="fg-grid">
+          <div class="fg-field">
+            <label class="fg-label" for="fp-current">Current Grade (%)</label>
+            <input class="inp" id="fp-current" type="number" min="0" max="100" step="0.1"
+                   placeholder="e.g. 88" oninput="calcProjected()">
+          </div>
+          <div class="fg-field">
+            <label class="fg-label" for="fp-weight">Final Exam Weight (%)</label>
+            <input class="inp" id="fp-weight" type="number" min="1" max="99" step="1"
+                   placeholder="e.g. 20" oninput="calcProjected()">
+          </div>
+          <div class="fg-field">
+            <label class="fg-label" for="fp-score">Final Exam Score (%)</label>
+            <input class="inp" id="fp-score" type="number" min="0" max="100" step="0.1"
+                   placeholder="e.g. 95" oninput="calcProjected()">
+          </div>
+        </div>
+        <div class="result-area" id="fp-result"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>Raider Hub &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; 2025&#8211;2026</footer>
+
+  <script>
+    // ── Grade tables ──────────────────────────────────────────────────
+    const GRADE_POINTS = {
+      'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+      'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+      'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+      'D+': 1.3, 'D': 1.0, 'D-': 0.7,
+      'F':  0.0,
+    };
+
+    const CREDIT_OPTIONS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
+    function pctToLetter(p) {
+      if (p >= 97) return 'A+'; if (p >= 93) return 'A';  if (p >= 90) return 'A-';
+      if (p >= 87) return 'B+'; if (p >= 83) return 'B';  if (p >= 80) return 'B-';
+      if (p >= 77) return 'C+'; if (p >= 73) return 'C';  if (p >= 70) return 'C-';
+      if (p >= 67) return 'D+'; if (p >= 63) return 'D';  if (p >= 60) return 'D-';
+      return 'F';
+    }
+
+    // ── Tabs ──────────────────────────────────────────────────────────
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+    }
+
+    // ── GPA Calculator ────────────────────────────────────────────────
+    let courseId = 0;
+
+    function gradeOpts(sel) {
+      return Object.keys(GRADE_POINTS).map(g =>
+        `<option${g === sel ? ' selected' : ''}>${g}</option>`).join('');
+    }
+
+    function creditOpts(sel) {
+      return CREDIT_OPTIONS.map(c =>
+        `<option value="${c}"${c === sel ? ' selected' : ''}>${c}</option>`).join('');
+    }
+
+    function addCourse(name = '', grade = 'A', credits = 1) {
+      const id = ++courseId;
+      const row = document.createElement('div');
+      row.className = 'course-row';
+      row.id = 'cr-' + id;
+      row.innerHTML =
+        `<input class="inp" type="text" placeholder="Course name" value="${esc(name)}" oninput="recalcGPA()">` +
+        `<select class="sel" onchange="recalcGPA()">${gradeOpts(grade)}</select>` +
+        `<select class="sel" onchange="recalcGPA()">${creditOpts(credits)}</select>` +
+        `<button class="remove-btn" onclick="removeCourse(${id})" title="Remove">&#x2715;</button>`;
+      document.getElementById('courses-list').appendChild(row);
+      recalcGPA();
+    }
+
+    function removeCourse(id) {
+      const el = document.getElementById('cr-' + id);
+      if (el) { el.remove(); recalcGPA(); }
+    }
+
+    function recalcGPA() {
+      let pts = 0, creds = 0;
+      document.querySelectorAll('#courses-list .course-row').forEach(row => {
+        const sels = row.querySelectorAll('select');
+        const gp   = GRADE_POINTS[sels[0].value];
+        const cr   = parseFloat(sels[1].value);
+        if (!isNaN(cr) && cr > 0) { pts += gp * cr; creds += cr; }
+      });
+      const el = document.getElementById('gpa-num');
+      el.textContent = creds === 0 ? '—' : (pts / creds).toFixed(2);
+    }
+
+    addCourse('', 'A',  1);
+    addCourse('', 'B+', 1);
+    addCourse('', 'A-', 1);
+
+    // ── Final grade calculators ───────────────────────────────────────
+    function showResult(elId, num, label, note, warn) {
+      document.getElementById(elId).innerHTML =
+        `<div class="result-num" style="color:${warn ? 'rgba(255,160,80,1)' : '#fff'}">${num}</div>` +
+        `<div class="result-label">${label}</div>` +
+        (note ? `<div class="result-note">${note}</div>` : '');
+    }
+
+    function calcNeeded() {
+      const cur    = parseFloat(document.getElementById('fn-current').value);
+      const weight = parseFloat(document.getElementById('fn-weight').value);
+      const target = parseFloat(document.getElementById('fn-target').value);
+      if ([cur, weight, target].some(isNaN)) { document.getElementById('fn-result').innerHTML = ''; return; }
+      const w      = weight / 100;
+      const needed = (target - cur * (1 - w)) / w;
+      const letter = pctToLetter(target);
+      if (needed > 100) {
+        showResult('fn-result', '> 100%', 'Needed on Final',
+          `A ${letter} isn’t mathematically reachable — your current grade is too low.`, true);
+      } else if (needed <= 0) {
+        showResult('fn-result', '0%', 'Needed on Final',
+          `You’ve already locked in a ${letter} — no matter what you score!`, false);
+      } else {
+        showResult('fn-result', needed.toFixed(1) + '%', 'Needed on Final',
+          `Score this or higher to finish with a ${letter} (${target}%).`, false);
+      }
+    }
+
+    function calcProjected() {
+      const cur    = parseFloat(document.getElementById('fp-current').value);
+      const weight = parseFloat(document.getElementById('fp-weight').value);
+      const score  = parseFloat(document.getElementById('fp-score').value);
+      if ([cur, weight, score].some(isNaN)) { document.getElementById('fp-result').innerHTML = ''; return; }
+      const w    = weight / 100;
+      const proj = cur * (1 - w) + score * w;
+      const letter = pctToLetter(proj);
+      const praise = proj >= 90 ? 'Great work!' : proj >= 80 ? 'Solid effort.' : proj >= 70 ? 'You’re passing.' : 'Keep pushing — you’ve got this.';
+      showResult('fp-result', proj.toFixed(1) + '%', `Projected Grade · ${letter}`, praise, proj < 70);
+    }
+
+    // ── Helper ────────────────────────────────────────────────────────
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Background: match current class color ─────────────────────────
+    const BG = {
+      red: '#C62828', orange: '#E64A19', yellow: '#F9A825',
+      green: '#2E7D32', lightblue: '#0277BD', royalblue: '#283593',
+      purple: '#7B1FA2', none: '#00285E',
+    };
+
+    function getLateLunch() {
+      try { return JSON.parse(localStorage.getItem('phLateLunch')) || {}; } catch { return {}; }
+    }
+
+    function hm(h, m) { return h * 60 + m; }
+
+    function buildSched(day, ll) {
+      const s = (sh,sm,eh,em,c) => ({ s:hm(sh,sm), e:hm(eh,em), c });
+      switch (day) {
+        case 1: { const b=[s(8,45,9,30,'red'),s(9,35,10,20,'orange'),s(10,35,11,20,'yellow'),s(11,25,12,10,'green')]; const m=ll?[s(12,10,12,55,'lightblue'),s(12,55,13,40,'none')]:[s(12,10,12,55,'none'),s(12,55,13,40,'lightblue')]; return [...b,...m,s(13,45,14,30,'royalblue'),s(14,35,15,20,'purple')]; }
+        case 2: { const b=[s(8,45,10,0,'yellow'),s(10,0,10,15,'none'),s(10,15,10,45,'none'),s(10,45,12,0,'orange')]; const m=ll?[s(12,0,12,45,'red'),s(12,45,13,30,'none'),s(13,30,14,0,'red')]:[s(12,0,12,45,'none'),s(12,45,14,0,'red')]; return [...b,...m,s(14,5,14,30,'none'),s(14,30,15,20,'none')]; }
+        case 3: { const b=[s(8,45,10,0,'lightblue'),s(10,0,10,45,'none'),s(10,45,12,0,'green')]; const m=ll?[s(12,0,12,45,'purple'),s(12,45,13,30,'none'),s(13,30,14,0,'purple')]:[s(12,0,12,45,'none'),s(12,45,14,0,'purple')]; return [...b,...m,s(14,5,15,20,'royalblue')]; }
+        case 4: { const b=[s(10,0,11,15,'red'),s(11,15,11,30,'none'),s(11,30,12,0,'none')]; const m=ll?[s(12,0,12,45,'orange'),s(12,45,13,30,'none'),s(13,30,14,0,'orange')]:[s(12,0,12,45,'none'),s(12,45,14,0,'orange')]; return [...b,...m,s(14,5,15,20,'yellow')]; }
+        case 5: { const b=[s(8,45,10,0,'royalblue'),s(10,0,10,25,'none'),s(10,25,10,45,'none'),s(10,45,12,0,'purple')]; const m=ll?[s(12,0,12,45,'green'),s(12,45,13,30,'none'),s(13,30,14,0,'green')]:[s(12,0,12,45,'none'),s(12,45,14,0,'green')]; return [...b,...m,s(14,5,15,20,'lightblue')]; }
+        default: return [];
+      }
+    }
+
+    let lastBg = '';
+    function updateBackground() {
+      const now = new Date(), day = now.getDay();
+      let key = 'none';
+      if (day >= 1 && day <= 5) {
+        const ll = getLateLunch();
+        const dk = ['','mon','tue','wed','thu','fri'][day];
+        const mn = now.getHours() * 60 + now.getMinutes();
+        for (const sl of buildSched(day, !!ll[dk]))
+          if (mn >= sl.s && mn < sl.e && sl.c !== 'none') { key = sl.c; break; }
+      }
+      if (key !== lastBg) { document.body.style.backgroundColor = BG[key]; lastBg = key; }
+    }
+
+    updateBackground();
+    setInterval(updateBackground, 10000);
+  </script>
+</body>
+</html>
