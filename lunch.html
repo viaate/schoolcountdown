@@ -349,16 +349,70 @@
         bowl:  ['Mediterranean Chicken Greek Salad'],
         main:  ['BBQ Pork or Chicken Bowl', 'BBQ Tofu', 'Vegetable Medley', 'Baked Macaroni and Cheese'],
       },
+
+      // May 2026
+      '2026-5-1': {
+        soup:  ['Broccoli Cheddar Soup'],
+        bowl:  ['Mediterranean Chicken Greek Salad'],
+        main:  ['Pepperoni Pizza', 'Cheese Pizza', 'Garden Vegetable Pizza', 'Steamed Broccoli'],
+      },
+      '2026-5-4': {
+        soup:  ['Broccoli Cheddar Soup'],
+        bowl:  ['Revved Up Meatballs', 'Creamy Vegetable Alfredo Pasta'],
+        main:  ['Orange Chicken', 'Stir Fry Vegetables', 'Vegetable Stir Fried Rice', 'Vegetable Egg Roll'],
+      },
+      '2026-5-5': {
+        soup:  ['Tex Mex Gumbo'],
+        bowl:  ['Revved Up Meatballs', 'Creamy Vegetable Alfredo Pasta'],
+        main:  ['Beef Enchiladas', 'Mushroom and Black Bean Cheese Enchilada', 'Spanish Rice', 'Vegetable Medley'],
+      },
+      '2026-5-6': {
+        soup:  ['Chicken and Corn Chowder with Bacon'],
+        bowl:  ['Revved Up Meatballs', 'Creamy Vegetable Alfredo Pasta'],
+        main:  ['Caesar Chicken Wrap', 'Balsamic Vegetable Wrap', 'Oven Roasted Potatoes', 'Vegetable Medley'],
+      },
+      '2026-5-7': {
+        soup:  ['Italian Vegetable Orzo Soup'],
+        bowl:  ['Chicken Parmesan', 'Spaghetti', 'Lemon Garlic Pasta Primavera'],
+        main:  ['Roast Pork Loin', 'Herb Rice Pilaf', 'Glazed Carrots', 'Parmesan Crusted Squash'],
+      },
+      '2026-5-8': {
+        soup:  ['Broccoli Cheddar Soup'],
+        bowl:  ['Chicken Parmesan', 'Spaghetti', 'Lemon Garlic Pasta Primavera'],
+        main:  ['BBQ Pulled Chicken', 'BBQ Tofu', 'Waffle Fries', 'Green Bean Salad'],
+      },
+      '2026-5-11': {
+        soup:  ['Southwestern Pork, Bean Soup'],
+        bowl:  ['BBQ Pulled Chicken', '3 Cheese Macaroni'],
+        main:  ['Grilled Pesto Chicken Breast', 'Roasted Potato Wedges', 'Steamed Vegetable Medley', 'Quinoa Stuffed Peppers'],
+      },
+      '2026-5-12': {
+        soup:  ['Baked Potato Soup'],
+        bowl:  ['BBQ Pulled Chicken', '3 Cheese Macaroni'],
+        main:  ['Beef and Broccoli Stir Fry', 'Vegetable-Tofu Stir Fry', 'Steamed Rice', 'Pork Egg Roll'],
+      },
+      '2026-5-13': {
+        soup:  ['White Chicken Chili'],
+        bowl:  ['BBQ Pulled Chicken', '3 Cheese Macaroni'],
+        main:  ['Pork and Sausage Gumbo with Rice', 'Vegetarian Louisiana Gumbo', 'Steamed Rice', 'Fresh Green Beans'],
+      },
+      '2026-5-14': {
+        soup:  ['Garden Vegetable Soup'],
+        bowl:  ['Tex Mex Bowl!!', 'Sliced Rubbed Brisket or SW BBQ Chicken'],
+        main:  ['Seasoned Chicken Fingers', 'Tofu Fingers', 'Creamy Mashed Potatoes', 'Roasted Broccoli'],
+      },
+      '2026-5-15': {
+        soup:  ['Garden Vegetable Soup'],
+        bowl:  ['Tex Mex Bowl!!', 'Sliced Rubbed Brisket or SW BBQ Chicken'],
+        main:  ['Pepperoni Pizza', 'Cheese Pizza', 'Garden Vegetable Pizza', 'Steamed Broccoli'],
+      },
     };
 
     // No-school days (weekdays with no lunch)
     const NO_SCHOOL = new Set([
       '2026-4-17', // Parent/Teacher Conferences
-      '2026-5-18', // May 18 no school
+      '2026-5-25', // Memorial Day
     ]);
-
-    // Spring break / data-not-available days treated as no menu
-    const SPRING_BREAK_END = { year: 2026, month: 4, day: 11 }; // Apr 6-10 no data
 
     const DAY_NAMES  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const MON_NAMES  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -455,9 +509,9 @@
       }
 
       card.innerHTML =
-        section('&#127859;', 'Soup', menu.soup) +
+        section('&#127869;', 'Main Entree & Sides', menu.main) +
         section('&#127857;', "Bowl'd", menu.bowl) +
-        section('&#127869;', 'Main Entree & Sides', menu.main);
+        section('&#127859;', 'Soup', menu.soup);
     }
 
     function buildWeekNav(active) {
