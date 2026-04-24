@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pembroke Hill — Last Day Countdown</title>
+  <title>Raider Hub | Countdown</title>
   <style>
     :root {
       --blue:      #00285E;
@@ -21,14 +21,14 @@
 
     body {
       min-height: 100vh;
-      background: linear-gradient(145deg, var(--blue) 0%, var(--blue-mid) 50%, #001f4a 100%);
+      background-color: var(--blue);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--white);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem 1rem 3rem;
-      transition: background 0.9s ease;
+      transition: background-color 0.9s ease;
     }
 
     /* ── Header ─────────────────────────────────────── */
@@ -84,32 +84,16 @@
 
     /* ── Card ────────────────────────────────────────── */
     .card {
-      background: var(--card-bg);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
       border-radius: 20px;
       padding: 2rem 1.75rem 1.75rem;
-      backdrop-filter: blur(12px);
-      box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
       position: relative;
       overflow: hidden;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 40px rgba(0,0,0,0.45);
     }
 
     .card-icon {
@@ -279,24 +263,23 @@
       z-index: 200;
     }
     .nav-btn {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,184,28,0.35);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
       color: var(--white);
       border-radius: 10px;
-      padding: 0.45rem 0.8rem;
-      font-size: 0.78rem;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      backdrop-filter: blur(10px);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.35rem;
       transition: background 0.2s;
       letter-spacing: 0.03em;
       font-family: inherit;
     }
-    .nav-btn:hover { background: rgba(255,184,28,0.2); }
+    .nav-btn:hover { background: rgba(255,255,255,0.28); }
 
     /* ── Settings modal ─────────────────────────────────── */
     .modal-overlay {
@@ -390,7 +373,7 @@
   </div>
 
   <header>
-    <p class="school-name">Pembroke Hill School</p>
+    <p class="school-name">Raider Hub</p>
     <h1 class="page-title">Countdown to <span>Last Day</span></h1>
     <div class="divider"></div>
     <p class="page-subtitle">May 21, 2026 &nbsp;·&nbsp; 11:45 AM</p>
@@ -446,7 +429,7 @@
   </div>
 
   <footer>
-    Updates every second &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; Last Day: May 21, 2026
+    Updates every second &nbsp;·&nbsp; Raider Hub &nbsp;·&nbsp; Last Day: May 21, 2026
   </footer>
 
   <script>
@@ -728,14 +711,14 @@
 
     // ── Dynamic background ────────────────────────────────────────────
     const INDEX_BG = {
-      red:       'linear-gradient(145deg,#7B0000 0%,#C62828 50%,#1a0000 100%)',
-      orange:    'linear-gradient(145deg,#6D2500 0%,#E64A19 50%,#1A0500 100%)',
-      yellow:    'linear-gradient(145deg,#5D3E00 0%,#9A6200 50%,#1A1000 100%)',
-      green:     'linear-gradient(145deg,#003300 0%,#2E7D32 50%,#001500 100%)',
-      lightblue: 'linear-gradient(145deg,#002A4A 0%,#0277BD 50%,#001020 100%)',
-      royalblue: 'linear-gradient(145deg,#0D1257 0%,#283593 50%,#030825 100%)',
-      purple:    'linear-gradient(145deg,#1A0030 0%,#7B1FA2 50%,#0A0015 100%)',
-      none:      'linear-gradient(145deg,#00285E 0%,#003d8f 50%,#001f4a 100%)',
+      red:       '#C62828',
+      orange:    '#E64A19',
+      yellow:    '#F9A825',
+      green:     '#2E7D32',
+      lightblue: '#0277BD',
+      royalblue: '#283593',
+      purple:    '#7B1FA2',
+      none:      '#00285E',
     };
 
     function hmI(h, m) { return h * 60 + m; }
@@ -787,7 +770,7 @@
         }
       }
       if (colorKey !== lastBgKey) {
-        document.body.style.background = INDEX_BG[colorKey];
+        document.body.style.backgroundColor = INDEX_BG[colorKey];
         lastBgKey = colorKey;
       }
     }

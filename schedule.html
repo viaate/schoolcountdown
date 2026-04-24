@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pembroke Hill — Class Schedule</title>
+  <title>Raider Hub | Schedule</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -481,33 +481,33 @@
       let html = '';
 
       if (state.type === 'summer') {
-        html = `<div class="school-label">Pembroke Hill School</div>
+        html = `<div class="school-label">Raider Hub</div>
                 <div class="big-msg">School's out<br>for summer! 🎉</div>`;
 
       } else if (state.type === 'weekend') {
-        html = `<div class="school-label">Pembroke Hill School</div>
+        html = `<div class="school-label">Raider Hub</div>
                 <div class="big-msg" style="font-size:2.8rem">Enjoy your weekend!</div>
                 <div class="sub-msg">No school today.</div>`;
 
       } else if (state.type === 'noschool') {
-        html = `<div class="school-label">Pembroke Hill School</div>
+        html = `<div class="school-label">Raider Hub</div>
                 <div class="big-msg" style="font-size:2.8rem">No school today!</div>
                 <div class="sub-msg">Monday, May 18</div>`;
 
       } else if (state.type === 'before') {
         const nc = state.nextClass;
-        html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+        html = `<div class="school-label">Raider Hub &nbsp;·&nbsp; ${today}</div>
                 <div class="status-badge">Before School</div>
                 <div class="class-name" style="font-size:clamp(1.8rem,5vw,2.8rem)">School starts soon</div>
                 ${nc ? `<div class="sub-msg">First up: <strong>${nc.label}</strong> at ${fmtMin(nc.s)}</div>` : ''}`;
 
       } else if (state.type === 'after') {
-        html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+        html = `<div class="school-label">Raider Hub &nbsp;·&nbsp; ${today}</div>
                 <div class="big-msg" style="font-size:2.8rem">School's done<br>for today!</div>`;
 
       } else if (state.type === 'passing') {
         const ns = state.nextSlot;
-        html = `<div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+        html = `<div class="school-label">Raider Hub &nbsp;·&nbsp; ${today}</div>
                 <div class="status-badge">Passing Period</div>
                 <div class="class-name" style="font-size:2.5rem">Between Classes</div>
                 ${ns ? `<div class="sub-msg" style="margin-top:1rem">Up next: <strong>${ns.label}</strong> at ${fmtMin(ns.s)}</div>` : ''}`;
@@ -523,7 +523,7 @@
           : `<div class="next-label">Last class of the day</div>`;
 
         html = `
-          <div class="school-label">Pembroke Hill School &nbsp;·&nbsp; ${today}</div>
+          <div class="school-label">Raider Hub &nbsp;·&nbsp; ${today}</div>
           <div class="status-badge">${isClass ? 'Now in Class' : slot.label}</div>
           <div class="class-name">${isClass ? slot.label : ''}</div>
           <div class="time-remaining">${secToDisplay(state.secLeft)}</div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pembroke Hill — What's for Lunch?</title>
+  <title>Raider Hub | Lunch</title>
   <style>
     :root {
       --blue:      #00285E;
@@ -21,14 +21,14 @@
 
     body {
       min-height: 100vh;
-      background: linear-gradient(145deg, var(--blue) 0%, var(--blue-mid) 50%, #001f4a 100%);
+      background-color: var(--blue);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       color: var(--white);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem 1rem 3rem;
-      transition: background 0.9s ease;
+      transition: background-color 0.9s ease;
     }
 
     /* ── Header ────────────────────────────────────────── */
@@ -78,24 +78,23 @@
       z-index: 200;
     }
     .nav-btn {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,184,28,0.35);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
       color: var(--white);
       border-radius: 10px;
-      padding: 0.45rem 0.8rem;
-      font-size: 0.78rem;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      backdrop-filter: blur(10px);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.35rem;
       transition: background 0.2s;
       letter-spacing: 0.03em;
       font-family: inherit;
     }
-    .nav-btn:hover { background: rgba(255,184,28,0.2); }
+    .nav-btn:hover { background: rgba(255,255,255,0.28); }
 
     /* ── Main content area ──────────────────────────────── */
     .content {
@@ -105,22 +104,12 @@
 
     /* ── Menu card ──────────────────────────────────────── */
     .menu-card {
-      background: var(--card-bg);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
       border-radius: 20px;
       padding: 2rem 1.75rem;
-      backdrop-filter: blur(12px);
-      box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
-    }
-
-    .menu-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
     }
 
     /* ── Off-day states ─────────────────────────────────── */
@@ -256,7 +245,7 @@
     .search-section {
       width: 100%;
       max-width: 640px;
-      margin-top: 1.75rem;
+      margin-bottom: 1.25rem;
     }
 
     .search-title {
@@ -323,15 +312,14 @@
     }
 
     .result-card {
-      background: var(--card-bg);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
       border-radius: 14px;
       padding: 0.85rem 1.1rem;
-      backdrop-filter: blur(12px);
       cursor: pointer;
       transition: background 0.15s;
     }
-    .result-card:hover { background: rgba(255,255,255,0.11); }
+    .result-card:hover { background: rgba(255,255,255,0.18); }
     .result-card.is-past { opacity: 0.45; }
     .result-card.is-today { border-color: rgba(255,184,28,0.5); }
 
@@ -398,31 +386,31 @@
   </div>
 
   <header>
-    <p class="school-name">Pembroke Hill School</p>
+    <p class="school-name">Raider Hub</p>
     <h1 class="page-title">What's for Lunch?</h1>
     <div class="divider"></div>
     <p class="date-label" id="date-label">Loading…</p>
   </header>
 
   <div class="content">
+    <!-- Search -->
+    <div class="search-section">
+      <div class="search-title">&#128269; Find a Menu Item</div>
+      <div class="search-wrap">
+        <input class="search-input" id="search-input" type="text"
+               placeholder="e.g. pizza, chicken, broccoli…"
+               oninput="doSearch(this.value)" autocomplete="off" spellcheck="false" />
+        <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear">&#x2715;</button>
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
+
     <div class="week-nav" id="week-nav"></div>
     <div class="menu-card" id="menu-card"></div>
     <p class="no-data-note" id="no-data-note"></p>
   </div>
 
-  <!-- Search -->
-  <div class="search-section">
-    <div class="search-title">&#128269; Find a Menu Item</div>
-    <div class="search-wrap">
-      <input class="search-input" id="search-input" type="text"
-             placeholder="e.g. pizza, chicken, broccoli…"
-             oninput="doSearch(this.value)" autocomplete="off" spellcheck="false" />
-      <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear">&#x2715;</button>
-    </div>
-    <div class="search-results" id="search-results"></div>
-  </div>
-
-  <footer>Ward Parkway Campus &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; 2025–2026</footer>
+  <footer>Raider Hub &nbsp;·&nbsp; Ward Parkway Campus &nbsp;·&nbsp; 2025–2026</footer>
 
   <script>
     // ── Lunch data keyed by "YYYY-M-D" ─────────────────────────────────
@@ -683,14 +671,14 @@
 
     // ── Background: match current class color ─────────────────────────
     const BG_GRADIENTS = {
-      red:       'linear-gradient(145deg,#7B0000 0%,#C62828 50%,#1a0000 100%)',
-      orange:    'linear-gradient(145deg,#6D2500 0%,#E64A19 50%,#1A0500 100%)',
-      yellow:    'linear-gradient(145deg,#5D3E00 0%,#9A6200 50%,#1A1000 100%)',
-      green:     'linear-gradient(145deg,#003300 0%,#2E7D32 50%,#001500 100%)',
-      lightblue: 'linear-gradient(145deg,#002A4A 0%,#0277BD 50%,#001020 100%)',
-      royalblue: 'linear-gradient(145deg,#0D1257 0%,#283593 50%,#030825 100%)',
-      purple:    'linear-gradient(145deg,#1A0030 0%,#7B1FA2 50%,#0A0015 100%)',
-      none:      'linear-gradient(145deg,#00285E 0%,#003d8f 50%,#001f4a 100%)',
+      red:       '#C62828',
+      orange:    '#E64A19',
+      yellow:    '#F9A825',
+      green:     '#2E7D32',
+      lightblue: '#0277BD',
+      royalblue: '#283593',
+      purple:    '#7B1FA2',
+      none:      '#00285E',
     };
 
     function getLateLunch() {
@@ -746,7 +734,7 @@
         }
       }
       if (colorKey !== lastBgKey) {
-        document.body.style.background = BG_GRADIENTS[colorKey];
+        document.body.style.backgroundColor = BG_GRADIENTS[colorKey];
         lastBgKey = colorKey;
       }
     }
