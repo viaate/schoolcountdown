@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pembroke Hill — What's for Lunch?</title>
+  <style>
+    :root {
+      --blue:      #00285E;
+      --blue-mid:  #003d8f;
+      --blue-light:#0055c4;
+      --white:     #ffffff;
+      --card-bg:   rgba(255,255,255,0.07);
+      --shadow:    0 8px 32px rgba(0,0,0,0.35);
+      --accent:    rgba(255,255,255,0.65);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, var(--blue) 0%, var(--blue-mid) 50%, #001f4a 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+    }
+
+    /* ── Header ────────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      margin-top: 1rem;
+    }
+
+    .school-name {
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--accent);
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--white);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    .divider {
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      margin: 1rem auto;
+    }
+
+    .date-label {
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Nav buttons ───────────────────────────────────── */
+    .nav-btns {
+      position: fixed;
+      top: 1.1rem;
+      right: 1.1rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 200;
+    }
+    .nav-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,184,28,0.35);
+      color: var(--white);
+      border-radius: 10px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background 0.2s;
+      letter-spacing: 0.03em;
+      font-family: inherit;
+    }
+    .nav-btn:hover { background: rgba(255,184,28,0.2); }
+
+    /* ── Main content area ──────────────────────────────── */
+    .content {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ── Menu card ──────────────────────────────────────── */
+    .menu-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    }
+
+    /* ── Off-day states ─────────────────────────────────── */
+    .off-day {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .off-day .icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .off-day .title {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .off-day .sub {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* ── Menu section labels ────────────────────────────── */
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section:last-child { margin-bottom: 0; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-icon {
+      font-size: 1.3rem;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .section-divider {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .menu-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding-left: 0.25rem;
+    }
+
+    .menu-items li {
+      font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      padding: 0.3rem 0;
+      padding-left: 1rem;
+      border-left: 2px solid rgba(255,255,255,0.15);
+      line-height: 1.35;
+    }
+
+    /* ── Week nav strip ─────────────────────────────────── */
+    .week-nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .day-pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+      border-radius: 8px;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      letter-spacing: 0.03em;
+    }
+
+    .day-pill:hover {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+
+    .day-pill.active {
+      background: rgba(255,184,28,0.2);
+      border-color: rgba(255,184,28,0.5);
+      color: #fff;
+    }
+
+    .day-pill.no-data {
+      opacity: 0.35;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* ── No data note ───────────────────────────────────── */
+    .no-data-note {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 480px) {
+      .menu-card { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <div class="nav-btns">
+    <a href="index.html" class="nav-btn">&#8592; Countdown</a>
+    <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
+  </div>
+
+  <header>
+    <p class="school-name">Pembroke Hill School</p>
+    <h1 class="page-title">What's for Lunch?</h1>
+    <div class="divider"></div>
+    <p class="date-label" id="date-label">Loading…</p>
+  </header>
+
+  <div class="content">
+    <div class="week-nav" id="week-nav"></div>
+    <div class="menu-card" id="menu-card"></div>
+    <p class="no-data-note" id="no-data-note"></p>
+  </div>
+
+  <footer>Ward Parkway Campus &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; 2025–2026</footer>
+
+  <script>
+    // ── Lunch data keyed by "YYYY-M-D" ─────────────────────────────────
+    const MENU = {
+      // April 2026
+      '2026-4-13': {
+        soup:  ['Tuscan Vegetable Soup'],
+        bowl:  ['Chicken and Cheddar Nachos', 'Mexican Rice'],
+        main:  ['Linguini, Garlic, Chicken', 'Rotini Mushroom Sauce & Asparagus', 'Linguini', 'Vegetable Medley'],
+      },
+      '2026-4-14': {
+        soup:  ['Beef Chili'],
+        bowl:  ['Chicken and Cheddar Nachos', 'Mexican Rice'],
+        main:  ['Smoked Brisket', 'Smoked BBQ Portobello Mushrooms', 'Creamy Macaroni & Cheese', 'Green Beans'],
+      },
+      '2026-4-15': {
+        soup:  ['Broccoli Cheddar Soup'],
+        bowl:  ['Chicken and Cheddar Nachos', 'Mexican Rice'],
+        main:  ['Chicken Stir Fry', 'Vegetable Stir Fried Rice', 'Vegetable Stir Fry', 'Stir Fry Vegetables', 'Teriyaki Chicken Potstickers'],
+      },
+      '2026-4-16': {
+        soup:  ['Garden Vegetable Soup'],
+        bowl:  ['Mexican Rice', 'Birria Chili Consume', 'Mexican Stewed Beef or Chicken!'],
+        main:  ['Scrambled Eggs Vegetable Fritata', 'Pork Sausage', 'Hash Browns', 'Roasted Broccoli'],
+      },
+      // Apr 17 = No School (Parent/Teacher Conferences)
+      '2026-4-20': {
+        soup:  ['Potato Soup'],
+        bowl:  ['Pan Asian Rice Bowl! Char siu Pork or Teriyaki Chicken!'],
+        main:  ['Sloppy Joe Sandwich', 'Vegetarian Lentil Sloppy Joe', 'Vegetable Medley', 'Potato Wedges'],
+      },
+      '2026-4-21': {
+        soup:  ['Tomato Soup'],
+        bowl:  ['Pan Asian Rice Bowl! Char siu Pork or Teriyaki Chicken!'],
+        main:  ['Creamy Butter Chicken!', 'Steamed Basmati Rice', 'Braised Chickpea Curry', 'Naan Flatbread'],
+      },
+      '2026-4-22': {
+        soup:  ['Tuscan Vegetable Soup'],
+        bowl:  ['Pan Asian Rice Bowl! Char siu Pork or Teriyaki Chicken!'],
+        main:  ['Roasted Pork Chop', 'Cous Cous Stuffed Pepper', 'Macaroni and Cheese', 'Vegetable Medley'],
+      },
+      '2026-4-23': {
+        soup:  ['Tomato Soup'],
+        bowl:  ['Teriyaki Noodle or Quinoa Bowl!', 'Teriyaki Chicken or Soy Glazed Pork'],
+        main:  ['Buffalo Chicken Wrap', 'Balsamic Vegetable Wrap', 'Glazed Carrots', 'Rice Pilaf'],
+      },
+      '2026-4-24': {
+        soup:  ['Clam Chowder'],
+        bowl:  ['Teriyaki Noodle or Quinoa Bowl!', 'Teriyaki Chicken or Soy Glazed Pork'],
+        main:  ['Carved Beef Sirloin!', 'Pesto Salmon Caesar Salad', 'Cous Cous Stuffed Tomato', 'Oven Roasted Fingerling Potatoes', 'Roasted Asparagus'],
+      },
+      '2026-4-27': {
+        soup:  ['Broccoli Cheddar Soup'],
+        bowl:  ['Breakfast Bowl'],
+        main:  ['Chicken Pot Pie', 'Vegetable Pot Pie', 'Mashed Potatoes', 'Buttermilk Biscuit', 'Steamed Broccoli, Cauliflower'],
+      },
+      '2026-4-28': {
+        soup:  ['Broccoli Cheddar Soup'],
+        bowl:  ['Breakfast Bowl'],
+        main:  ['Beef Philly Steak Sandwich with Cheese Sauce', 'Eggplant Spinach "Meatball" Hero', 'Seasoned French Fries', 'Green Beans'],
+      },
+      '2026-4-29': {
+        soup:  ['Beef Chili'],
+        bowl:  ['Breakfast Bowl'],
+        main:  ['Grilled Chili Lime Chicken', 'Vegetable Mozzarella Frittata', 'Cilantro Lime Rice', 'Chili, Squash, Zucchini, Corn'],
+      },
+      '2026-4-30': {
+        soup:  ['Baked Potato Soup'],
+        bowl:  ['Mediterranean Chicken Greek Salad'],
+        main:  ['BBQ Pork or Chicken Bowl', 'BBQ Tofu', 'Vegetable Medley', 'Baked Macaroni and Cheese'],
+      },
+    };
+
+    // No-school days (weekdays with no lunch)
+    const NO_SCHOOL = new Set([
+      '2026-4-17', // Parent/Teacher Conferences
+      '2026-5-18', // May 18 no school
+    ]);
+
+    // Spring break / data-not-available days treated as no menu
+    const SPRING_BREAK_END = { year: 2026, month: 4, day: 11 }; // Apr 6-10 no data
+
+    const DAY_NAMES  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MON_NAMES  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    function dateKey(d) {
+      return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    }
+
+    function isWeekend(d) { const wd = d.getDay(); return wd === 0 || wd === 6; }
+
+    function isNoSchool(d) {
+      return NO_SCHOOL.has(dateKey(d));
+    }
+
+    function friendlyDate(d) {
+      return `${DAY_NAMES[d.getDay()]}, ${MON_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    }
+
+    // ── Get the school-week days around a given date ──────────────────
+    function getWeekDays(d) {
+      // Monday of current week
+      const day = d.getDay();
+      const monday = new Date(d);
+      monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+      const days = [];
+      for (let i = 0; i < 5; i++) {
+        const dd = new Date(monday);
+        dd.setDate(monday.getDate() + i);
+        days.push(dd);
+      }
+      return days;
+    }
+
+    // ── Render the menu for a given date ─────────────────────────────
+    let viewDate = new Date();
+
+    function render(d) {
+      viewDate = d;
+      const key  = dateKey(d);
+      const menu = MENU[key];
+
+      // Update header date
+      document.getElementById('date-label').textContent = friendlyDate(d);
+      document.getElementById('no-data-note').textContent = '';
+
+      // Build week nav
+      buildWeekNav(d);
+
+      const card = document.getElementById('menu-card');
+
+      if (isWeekend(d)) {
+        card.innerHTML = `
+          <div class="off-day">
+            <span class="icon">&#127774;</span>
+            <div class="title">It's the Weekend!</div>
+            <div class="sub">No school &mdash; enjoy your break.</div>
+          </div>`;
+        return;
+      }
+
+      if (isNoSchool(d)) {
+        card.innerHTML = `
+          <div class="off-day">
+            <span class="icon">&#127981;</span>
+            <div class="title">No School Today</div>
+            <div class="sub">${friendlyDate(d)}</div>
+          </div>`;
+        return;
+      }
+
+      if (!menu) {
+        card.innerHTML = `
+          <div class="off-day">
+            <span class="icon">&#127860;</span>
+            <div class="title">Menu Not Available</div>
+            <div class="sub">No lunch data for this day yet.</div>
+          </div>`;
+        document.getElementById('no-data-note').textContent =
+          'Menus are added monthly. Check back when the next menu is posted.';
+        return;
+      }
+
+      function section(icon, label, items) {
+        const lis = items.map(i => `<li>${escHtml(i)}</li>`).join('');
+        return `
+          <div class="section">
+            <div class="section-header">
+              <span class="section-icon">${icon}</span>
+              <span class="section-label">${label}</span>
+              <div class="section-divider"></div>
+            </div>
+            <ul class="menu-items">${lis}</ul>
+          </div>`;
+      }
+
+      card.innerHTML =
+        section('&#127859;', 'Soup', menu.soup) +
+        section('&#127857;', "Bowl'd", menu.bowl) +
+        section('&#127869;', 'Main Entree & Sides', menu.main);
+    }
+
+    function buildWeekNav(active) {
+      const weekDays = getWeekDays(active);
+      const activeKey = dateKey(active);
+      const nav = document.getElementById('week-nav');
+      nav.innerHTML = weekDays.map(d => {
+        const k   = dateKey(d);
+        const has = !!MENU[k];
+        const off = isNoSchool(d);
+        const cls = [
+          'day-pill',
+          k === activeKey ? 'active' : '',
+          (!has && !off && !isWeekend(d)) ? 'no-data' : '',
+        ].filter(Boolean).join(' ');
+        const label = DAY_NAMES[d.getDay()].slice(0, 3) + ' ' + d.getDate();
+        return `<button class="${cls}" onclick="render(new Date(${d.getFullYear()},${d.getMonth()},${d.getDate()}))">${label}</button>`;
+      }).join('');
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    render(new Date());
+  </script>
+</body>
+</html>
