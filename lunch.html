@@ -112,8 +112,8 @@
     body.dark-text .divider { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent); }
     body.dark-text .week-nav button { color: rgba(0,0,0,0.65); background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.15); }
     body.dark-text .week-label { color: rgba(0,0,0,0.65); }
-    body.dark-text .search-inp { color: #1a1000; background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.18); }
-    body.dark-text .search-inp::placeholder { color: rgba(0,0,0,0.35); }
+    body.dark-text .search-input { color: #1a1000; background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.18); }
+    body.dark-text .search-input::placeholder { color: rgba(0,0,0,0.35); }
 
     /* ── Main content area ──────────────────────────────── */
     .content {
@@ -405,6 +405,61 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.5);
     }
 
+    /* ── Favorites ───────────────────────────────────────── */
+    .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.3rem 0;
+      padding-left: 1rem;
+      border-left: 2px solid rgba(255,255,255,0.15);
+    }
+    .item-text {
+      flex: 1;
+      min-width: 0;
+      font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.35;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+    .star-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.25);
+      font-size: 1.05rem;
+      cursor: pointer;
+      padding: 0.1rem 0.25rem;
+      line-height: 1;
+      transition: color 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .star-btn:hover  { color: rgba(255,184,28,0.85); transform: scale(1.2); }
+    .star-btn.starred { color: rgba(255,184,28,1); }
+    .fav-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.65);
+      border-radius: 10px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.03em;
+      transition: background 0.2s, color 0.15s, border-color 0.15s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .fav-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .fav-btn.active {
+      background: rgba(255,184,28,0.2);
+      border-color: rgba(255,184,28,0.45);
+      color: rgba(255,184,28,1);
+    }
+    body.dark-text .fav-btn { color: rgba(0,0,0,0.6); background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.15); }
+    body.dark-text .fav-btn.active { color: #7a5800; background: rgba(120,80,0,0.12); border-color: rgba(120,80,0,0.3); }
+
     /* ── Settings modal ─────────────────────────────────── */
     .modal-overlay {
       display: none;
@@ -511,6 +566,7 @@
                placeholder="e.g. pizza, monday, may, chicken…"
                oninput="doSearch(this.value)" autocomplete="off" spellcheck="false" />
         <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear">&#x2715;</button>
+        <button class="fav-btn" id="fav-btn" onclick="toggleFavsMode()" title="Show favorites">&#9733;</button>
       </div>
       <div class="search-results" id="search-results"></div>
     </div>
@@ -739,7 +795,15 @@
       }
 
       function section(icon, label, items) {
-        const lis = items.map(i => `<li>${escHtml(i)}</li>`).join('');
+        const favs = getFavorites();
+        const lis = items.map(i => {
+          const starred = favs.has(i);
+          return `<li class="item-row">` +
+            `<span class="item-text">${escHtml(i)}</span>` +
+            `<button class="star-btn${starred?' starred':''}" data-item="${escHtml(i)}"` +
+              ` title="${starred?'Remove from favorites':'Add to favorites'}">${starred?'&#9733;':'&#9734;'}</button>` +
+          `</li>`;
+        }).join('');
         return `
           <div class="section">
             <div class="section-header">
@@ -871,6 +935,80 @@
       }
     }
 
+    // ── Favorites ────────────────────────────────────────────────────
+    function getFavorites() {
+      try { return new Set(JSON.parse(localStorage.getItem('phLunchFavs')) || []); } catch { return new Set(); }
+    }
+    function saveFavorites(set) {
+      localStorage.setItem('phLunchFavs', JSON.stringify([...set]));
+    }
+    function toggleFavorite(item) {
+      const favs = getFavorites();
+      if (favs.has(item)) favs.delete(item); else favs.add(item);
+      saveFavorites(favs);
+      if (favsMode) showFavorites(); else render(viewDate);
+    }
+
+    let favsMode = false;
+    function toggleFavsMode() {
+      favsMode = !favsMode;
+      document.getElementById('fav-btn').classList.toggle('active', favsMode);
+      if (favsMode) showFavorites();
+      else document.getElementById('search-results').innerHTML = '';
+    }
+
+    function showFavorites() {
+      const favs = getFavorites();
+      const el   = document.getElementById('search-results');
+      if (!favs.size) {
+        el.innerHTML = `<p class="search-empty">No favorites yet — tap &#9734; next to any menu item to save it here.</p>`;
+        return;
+      }
+      const today = new Date(); today.setHours(0,0,0,0);
+      const results = [];
+      for (const [key, menu] of Object.entries(MENU)) {
+        const [yr, mo, dy] = key.split('-').map(Number);
+        const date = new Date(yr, mo-1, dy);
+        const hits = [];
+        [['Main', menu.main], ["Bowl'd", menu.bowl], ['Soup', menu.soup]].forEach(([sec, items]) => {
+          items.forEach(item => { if (favs.has(item)) hits.push({ sec, item }); });
+        });
+        if (hits.length) results.push({ date, key, hits });
+      }
+      results.sort((a, b) => a.date - b.date);
+      if (!results.length) {
+        el.innerHTML = `<p class="search-empty">None of your favorites appear in the current menu data.</p>`;
+        return;
+      }
+      const firstUpcoming = results.find(r => r.date >= today);
+      el.innerHTML = results.map(r => {
+        const isPast  = r.date < today;
+        const isToday = r.date.toDateString() === today.toDateString();
+        const isNext  = !isPast && r === firstUpcoming && !isToday;
+        let badge = '';
+        if (isToday) badge = '<span class="result-badge">Today</span>';
+        else if (isNext) badge = '<span class="result-badge next">Next</span>';
+        const matchHtml = r.hits.map(h =>
+          `<div class="result-match"><span class="result-section-tag">${escHtml(h.sec)}</span>` +
+          `${escHtml(h.item)} <span style="color:rgba(255,184,28,0.9);font-size:0.85rem">&#9733;</span></div>`
+        ).join('');
+        return `<div class="result-card${isPast?' is-past':''}${isToday?' is-today':''}"` +
+          ` onclick="render(new Date(${r.date.getFullYear()},${r.date.getMonth()},${r.date.getDate()}));` +
+          `window.scrollTo({top:0,behavior:'smooth'})">` +
+          `<div class="result-date-row"><span class="result-date">${friendlyDate(r.date)}</span>${badge}</div>` +
+          `<div class="result-matches">${matchHtml}</div>` +
+        `</div>`;
+      }).join('');
+    }
+
+    // Click delegation for star buttons (persists across innerHTML replacements)
+    document.getElementById('menu-card').addEventListener('click', function(e) {
+      const btn = e.target.closest('.star-btn');
+      if (!btn) return;
+      e.stopPropagation();
+      toggleFavorite(btn.dataset.item);
+    });
+
     // ── Search ────────────────────────────────────────────────────────
     function highlightMatch(text, query) {
       const idx = text.toLowerCase().indexOf(query.toLowerCase());
@@ -881,6 +1019,11 @@
     }
 
     function doSearch(query) {
+      if (favsMode) {
+        favsMode = false;
+        document.getElementById('fav-btn').classList.remove('active');
+        render(viewDate);
+      }
       const q   = query.trim();
       const ql  = q.toLowerCase();
       const resultsEl = document.getElementById('search-results');

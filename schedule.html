@@ -226,6 +226,78 @@
     }
     .modal-close:hover { background: rgba(255,255,255,0.17); }
     .modal { max-height: 90vh; overflow-y: auto; }
+
+    /* ── Full day schedule panel ─────────────────────────── */
+    .sp-wrap {
+      margin-top: 2.5rem;
+      text-align: center;
+      width: 100%;
+    }
+    .sp-toggle-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: rgba(255,255,255,0.75);
+      border-radius: 10px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: background 0.2s, color 0.15s;
+    }
+    .sp-toggle-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    body.dark-text .sp-toggle-btn { color: rgba(0,0,0,0.65); background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.15); }
+    .sp-panel {
+      display: none;
+      width: min(400px, 90vw);
+      margin: 1rem auto 0;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      text-align: left;
+    }
+    .sp-panel.open { display: block; }
+    .sp-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.55rem 1.1rem;
+    }
+    .sp-row.current { background: rgba(255,255,255,0.1); }
+    .sp-row.past    { opacity: 0.38; }
+    .sp-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sp-info {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+      align-items: baseline;
+      min-width: 0;
+    }
+    .sp-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.82);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sp-row.current .sp-name { color: #fff; font-weight: 700; }
+    .sp-time {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.42);
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+    }
+    .sp-row.current .sp-time { color: rgba(255,255,255,0.7); }
     .modal-section-title {
       font-size: 0.65rem;
       letter-spacing: 0.18em;
@@ -294,6 +366,11 @@
   </div>
 
   <div id="main"></div>
+
+  <div class="sp-wrap" id="sp-wrap" style="display:none">
+    <button class="sp-toggle-btn" id="sp-toggle-btn" onclick="toggleSchedulePanel()">Today's Schedule</button>
+    <div class="sp-panel" id="sp-panel"></div>
+  </div>
 
   <!-- Settings Modal -->
   <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeSettings()">
@@ -638,6 +715,46 @@
       }
 
       main.innerHTML = html;
+
+      // Show/hide and refresh the full-day schedule panel
+      const spWrap = document.getElementById('sp-wrap');
+      if (spWrap) {
+        const isSchoolDay = ['in','before','after','passing'].includes(state.type);
+        spWrap.style.display = isSchoolDay ? '' : 'none';
+        if (spOpen && isSchoolDay) renderSchedulePanel();
+      }
+    }
+
+    // ── Full day schedule panel ───────────────────────────────────────
+    let spOpen = false;
+
+    function toggleSchedulePanel() {
+      spOpen = !spOpen;
+      document.getElementById('sp-panel').classList.toggle('open', spOpen);
+      document.getElementById('sp-toggle-btn').textContent = spOpen ? 'Hide Schedule' : "Today's Schedule";
+      if (spOpen) renderSchedulePanel();
+    }
+
+    function renderSchedulePanel() {
+      const now    = new Date();
+      const day    = now.getDay();
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const ll  = getLateLunch();
+      const dk  = ['','mon','tue','wed','thu','fri'][day];
+      const sched = buildSchedule(getEffectiveDay(day), !!ll[dk]);
+      const rows = sched.map(slot => {
+        const isCur  = nowMin >= slot.s && nowMin < slot.e;
+        const isPast = slot.e <= nowMin;
+        const ci = CLASS_COLORS[slot.color] || CLASS_COLORS.none;
+        const dot = slot.color !== 'none' ? ci.bg : 'rgba(255,255,255,0.18)';
+        return `<div class="sp-row${isCur?' current':''}${isPast?' past':''}">` +
+          `<div class="sp-dot" style="background:${dot}"></div>` +
+          `<div class="sp-info">` +
+            `<span class="sp-name">${slot.label}</span>` +
+            `<span class="sp-time">${fmtMin(slot.s)}&ndash;${fmtMin(slot.e)}</span>` +
+          `</div></div>`;
+      }).join('');
+      document.getElementById('sp-panel').innerHTML = `<div style="padding:0.4rem 0">${rows}</div>`;
     }
 
     loadSettingsUI();

@@ -356,6 +356,98 @@
     }
     .save-snap-btn:hover { background: rgba(255,255,255,0.22); color: #fff; }
 
+    /* ── GPA Trend Chart ─────────────────────────────────── */
+    .gpa-chart-section {
+      margin-top: 1rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .chart-section-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .gpa-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.35rem;
+      height: 72px;
+    }
+    .chart-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+    .chart-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+      width: 100%;
+      gap: 0.2rem;
+    }
+    .chart-val  { font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.65); line-height: 1; }
+    .chart-bar  { width: 100%; background: rgba(255,255,255,0.5); border-radius: 3px 3px 0 0; min-height: 3px; }
+    .chart-date { font-size: 0.52rem; color: rgba(255,255,255,0.32); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-top: 0.25rem; line-height: 1; }
+
+    /* ── Study Timer ─────────────────────────────────────── */
+    .timer-card { text-align: center; }
+    .timer-mode-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+    .timer-ring-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .timer-svg { display: block; }
+    .timer-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .timer-time {
+      font-size: clamp(2rem, 8vw, 2.8rem);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.5);
+    }
+    .timer-sessions { display: flex; gap: 0.55rem; justify-content: center; margin-bottom: 1.5rem; }
+    .session-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: background 0.3s;
+    }
+    .session-dot.filled { background: rgba(255,255,255,0.8); border-color: transparent; }
+    .timer-controls { display: flex; gap: 0.6rem; justify-content: center; }
+    .timer-btn {
+      border-radius: 12px;
+      padding: 0.6rem 1.3rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, color 0.15s;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .timer-btn.primary   { background: rgba(255,255,255,0.22); color: #fff; }
+    .timer-btn.primary:hover   { background: rgba(255,255,255,0.32); }
+    .timer-btn.secondary { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.65); }
+    .timer-btn.secondary:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
     @media (max-width: 500px) {
       .courses-header,
       .course-row { grid-template-columns: 1fr 88px 68px 30px; }
@@ -380,6 +472,7 @@
   <div class="tabs">
     <button class="tab active" onclick="switchTab('gpa', this)">GPA Calculator</button>
     <button class="tab" onclick="switchTab('final', this)">Final Grade</button>
+    <button class="tab" onclick="switchTab('timer', this)">Study Timer</button>
   </div>
 
   <div class="content">
@@ -454,6 +547,35 @@
       </div>
 
     </div>
+
+    <!-- ── Study Timer Panel ────────────────────────────── -->
+    <div class="panel" id="panel-timer">
+      <div class="calc-card timer-card">
+        <div class="timer-mode-label" id="timer-mode">Focus</div>
+        <div class="timer-ring-wrap">
+          <svg class="timer-svg" viewBox="0 0 120 120" width="190" height="190">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+            <circle id="timer-ring" cx="60" cy="60" r="50" fill="none"
+              stroke="rgba(255,255,255,0.82)" stroke-width="8"
+              stroke-dasharray="314.16" stroke-dashoffset="0"
+              stroke-linecap="round" transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="timer-overlay">
+            <div class="timer-time" id="timer-time">25:00</div>
+          </div>
+        </div>
+        <div class="timer-sessions" id="timer-sessions">
+          <div class="session-dot"></div><div class="session-dot"></div>
+          <div class="session-dot"></div><div class="session-dot"></div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn secondary" onclick="resetTimer()">Reset</button>
+          <button class="timer-btn primary" id="timer-toggle-btn" onclick="toggleTimer()">Start</button>
+          <button class="timer-btn secondary" onclick="skipTimer()">Skip</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <footer>Raider Hub &nbsp;·&nbsp; Pembroke Hill School &nbsp;·&nbsp; 2025&#8211;2026</footer>
@@ -554,6 +676,26 @@
       renderGPAHistory();
     }
 
+    function buildGPAChart(history) {
+      const data = [...history].reverse().slice(-12);
+      const CHART_H = 56;
+      const bars = data.map(h => {
+        const hpx = Math.max(3, Math.round(parseFloat(h.gpa) / 4.0 * CHART_H));
+        const shortDate = h.date.replace(/,\s*\d{4}/, '');
+        return `<div class="chart-col">` +
+          `<div class="chart-bar-wrap">` +
+            `<div class="chart-val">${h.gpa}</div>` +
+            `<div class="chart-bar" style="height:${hpx}px"></div>` +
+          `</div>` +
+          `<div class="chart-date">${shortDate}</div>` +
+        `</div>`;
+      }).join('');
+      return `<div class="gpa-chart-section">` +
+        `<div class="chart-section-title">Trend</div>` +
+        `<div class="gpa-chart">${bars}</div>` +
+      `</div>`;
+    }
+
     function renderGPAHistory() {
       const history = getGPAHistory();
       const container = document.getElementById('gpa-history');
@@ -570,6 +712,7 @@
               `<span class="history-date">${h.date}</span>` +
             `</div>`
           ).join('') +
+          (history.length >= 2 ? buildGPAChart(history) : '') +
         `</div>`;
     }
 
@@ -613,6 +756,69 @@
       const letter = pctToLetter(proj);
       const praise = proj >= 90 ? 'Great work!' : proj >= 80 ? 'Solid effort.' : proj >= 70 ? 'You’re passing.' : 'Keep pushing — you’ve got this.';
       showResult('fp-result', proj.toFixed(1) + '%', `Projected Grade · ${letter}`, praise, proj < 70);
+    }
+
+    // ── Study Timer (Pomodoro) ────────────────────────────────────────
+    const TIMER_DUR  = { work: 25*60, short: 5*60, long: 15*60 };
+    const TIMER_CIRC = 314.16; // 2π × 50
+    const timerSt = { mode: 'work', running: false, secsLeft: 25*60, sessions: 0 };
+    let timerIv = null;
+
+    function timerLabel(m) { return m==='work' ? 'Focus' : m==='short' ? 'Short Break' : 'Long Break'; }
+
+    function renderTimer() {
+      const prog = timerSt.secsLeft / TIMER_DUR[timerSt.mode];
+      document.getElementById('timer-ring').style.strokeDashoffset = TIMER_CIRC * (1 - prog);
+      const m = Math.floor(timerSt.secsLeft / 60), s = timerSt.secsLeft % 60;
+      document.getElementById('timer-time').textContent =
+        `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      document.getElementById('timer-mode').textContent = timerLabel(timerSt.mode);
+      document.getElementById('timer-toggle-btn').textContent = timerSt.running ? 'Pause' : 'Start';
+      const done = timerSt.sessions % 4;
+      document.getElementById('timer-sessions').innerHTML =
+        [0,1,2,3].map(i => `<div class="session-dot${i < done ? ' filled' : ''}"></div>`).join('');
+    }
+
+    function timerAdvance() {
+      timerSt.secsLeft--;
+      if (timerSt.secsLeft <= 0) {
+        clearInterval(timerIv); timerIv = null; timerSt.running = false;
+        if (timerSt.mode === 'work') {
+          timerSt.sessions++;
+          timerSt.mode = timerSt.sessions % 4 === 0 ? 'long' : 'short';
+        } else {
+          timerSt.mode = 'work';
+        }
+        timerSt.secsLeft = TIMER_DUR[timerSt.mode];
+      }
+      renderTimer();
+    }
+
+    function toggleTimer() {
+      timerSt.running = !timerSt.running;
+      if (timerSt.running) { timerIv = setInterval(timerAdvance, 1000); }
+      else { clearInterval(timerIv); timerIv = null; }
+      renderTimer();
+    }
+
+    function resetTimer() {
+      clearInterval(timerIv); timerIv = null;
+      timerSt.running = false;
+      timerSt.secsLeft = TIMER_DUR[timerSt.mode];
+      renderTimer();
+    }
+
+    function skipTimer() {
+      clearInterval(timerIv); timerIv = null;
+      timerSt.running = false;
+      if (timerSt.mode === 'work') {
+        timerSt.sessions++;
+        timerSt.mode = timerSt.sessions % 4 === 0 ? 'long' : 'short';
+      } else {
+        timerSt.mode = 'work';
+      }
+      timerSt.secsLeft = TIMER_DUR[timerSt.mode];
+      renderTimer();
     }
 
     // ── Helper ────────────────────────────────────────────────────────

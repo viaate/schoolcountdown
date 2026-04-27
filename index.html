@@ -268,6 +268,35 @@
     body.dark-text .card-icon { opacity: 0.45; }
     body.dark-text .done-banner { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.45); }
 
+    /* ── Semester progress bar ───────────────────────────── */
+    .year-progress {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+    }
+    .yp-track {
+      height: 4px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 0.45rem;
+    }
+    .yp-fill {
+      height: 100%;
+      background: rgba(255,255,255,0.5);
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+    .yp-label {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.35);
+      text-align: center;
+      letter-spacing: 0.07em;
+    }
+    body.dark-text .yp-track { background: rgba(0,0,0,0.12); }
+    body.dark-text .yp-fill  { background: rgba(0,0,0,0.35); }
+    body.dark-text .yp-label { color: rgba(0,0,0,0.4); }
+
     /* pulse animation for active today card */
     @keyframes pulse-school {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
@@ -469,6 +498,11 @@
     <div class="divider"></div>
     <p class="page-subtitle">May 21, 2026 &nbsp;·&nbsp; 11:45 AM</p>
   </header>
+
+  <div class="year-progress">
+    <div class="yp-track"><div class="yp-fill" id="yp-fill" style="width:0%"></div></div>
+    <div class="yp-label" id="yp-label"></div>
+  </div>
 
   <div class="grid">
 
@@ -896,6 +930,16 @@
         lastBgKey = colorKey;
       }
     }
+
+    // ── Semester progress bar ──────────────────────────────────────────
+    (function() {
+      const FIRST_DAY = new Date(2025, 8, 3); // Sep 3 2025
+      const total   = LAST_DAY - FIRST_DAY;
+      const elapsed = Math.max(0, Math.min(new Date() - FIRST_DAY, total));
+      const pct = Math.round(elapsed / total * 100);
+      document.getElementById('yp-fill').style.width = pct + '%';
+      document.getElementById('yp-label').textContent = `${pct}% through the school year`;
+    })();
 
     loadSettingsUI();
     updateBackground();
