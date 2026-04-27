@@ -110,12 +110,21 @@
 
     /* ── Card ────────────────────────────────────────────── */
     .calc-card {
-      background: rgba(0,0,0,0.28);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 20px;
       padding: 1.75rem;
       margin-bottom: 1rem;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
+
+    /* ── Yellow period: dark text mode ──────────────────── */
+    body.dark-text .school-name { color: rgba(0,0,0,0.5); }
+    body.dark-text .page-title { color: #1a1000; text-shadow: none; }
+    body.dark-text footer { color: rgba(0,0,0,0.4); }
+    body.dark-text .nav-btn { color: rgba(0,0,0,0.75); border-color: rgba(0,0,0,0.18); background: rgba(0,0,0,0.08); }
+    body.dark-text .nav-btn:hover { background: rgba(0,0,0,0.15); }
 
     /* ── GPA display ─────────────────────────────────────── */
     .gpa-display { text-align: center; margin-bottom: 1.5rem; }
@@ -358,8 +367,8 @@
 
   <div class="nav-btns">
     <a href="index.html" class="nav-btn">&#8962; Countdown</a>
-    <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
-    <a href="lunch.html" class="nav-btn">&#127869; Lunch</a>
+    <a href="schedule.html" class="nav-btn">Schedule</a>
+    <a href="lunch.html" class="nav-btn">Lunch</a>
   </div>
 
   <header>
@@ -655,7 +664,11 @@
         for (const sl of buildSched(getEffectiveDay(day), !!ll[dk]))
           if (mn >= sl.s && mn < sl.e && sl.c !== 'none') { key = sl.c; break; }
       }
-      if (key !== lastBg) { document.body.style.backgroundColor = BG[key]; lastBg = key; }
+      if (key !== lastBg) {
+        document.body.style.backgroundColor = BG[key];
+        document.body.classList.toggle('dark-text', key === 'yellow');
+        lastBg = key;
+      }
     }
 
     updateBackground();

@@ -96,6 +96,25 @@
     }
     .nav-btn:hover { background: rgba(255,255,255,0.28); }
 
+    /* ── Yellow period: dark text mode ──────────────────── */
+    body.dark-text { color: #1a1000; }
+    body.dark-text .nav-btn { color: rgba(0,0,0,0.75); border-color: rgba(0,0,0,0.18); background: rgba(0,0,0,0.08); }
+    body.dark-text .nav-btn:hover { background: rgba(0,0,0,0.15); }
+    body.dark-text .school-name { color: rgba(0,0,0,0.5); }
+    body.dark-text .page-title { color: #1a1000; text-shadow: none; }
+    body.dark-text .date-label { color: rgba(0,0,0,0.5); }
+    body.dark-text .section-label { color: rgba(0,0,0,0.5); }
+    body.dark-text .section-divider { background: rgba(0,0,0,0.12); }
+    body.dark-text .menu-card { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.12); }
+    body.dark-text .menu-items li { color: #1a1000; text-shadow: none; }
+    body.dark-text .off-day .sub { color: rgba(0,0,0,0.5); }
+    body.dark-text footer { color: rgba(0,0,0,0.4); }
+    body.dark-text .divider { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent); }
+    body.dark-text .week-nav button { color: rgba(0,0,0,0.65); background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.15); }
+    body.dark-text .week-label { color: rgba(0,0,0,0.65); }
+    body.dark-text .search-inp { color: #1a1000; background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.18); }
+    body.dark-text .search-inp::placeholder { color: rgba(0,0,0,0.35); }
+
     /* ── Main content area ──────────────────────────────── */
     .content {
       width: 100%;
@@ -457,9 +476,9 @@
   <!-- Nav -->
   <div class="nav-btns">
     <a href="index.html" class="nav-btn">&#8962; Countdown</a>
-    <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
-    <a href="calculator.html" class="nav-btn">&#128202; Grades</a>
-    <button class="nav-btn" onclick="openSettings()">&#9881; Settings</button>
+    <a href="schedule.html" class="nav-btn">Schedule</a>
+    <a href="calculator.html" class="nav-btn">Grades</a>
+    <button class="nav-btn" onclick="openSettings()">Settings</button>
   </div>
 
   <!-- Settings Modal -->
@@ -779,6 +798,14 @@
       const s = getLateLunch(); s[day] = val;
       localStorage.setItem('phLateLunch', JSON.stringify(s));
     }
+    function getDayOverrides() {
+      try { return JSON.parse(localStorage.getItem('phDayOverride')) || {}; } catch { return {}; }
+    }
+    function getEffectiveDay(day) {
+      const dk = ['','mon','tue','wed','thu','fri'][day];
+      const o = getDayOverrides();
+      return (dk && o[dk] != null) ? o[dk] : day;
+    }
     function loadSettingsUI() {
       const s = getLateLunch();
       ['mon','tue','wed','thu','fri'].forEach(d => {
@@ -831,7 +858,7 @@
       if (day >= 1 && day <= 5) {
         const ll = getLateLunch();
         const dk = ['','mon','tue','wed','thu','fri'][day];
-        const sched = buildBgSchedule(day, !!ll[dk]);
+        const sched = buildBgSchedule(getEffectiveDay(day), !!ll[dk]);
         const nowMin = now.getHours() * 60 + now.getMinutes();
         for (const sl of sched) {
           if (nowMin >= sl.s && nowMin < sl.e && sl.color !== 'none') { colorKey = sl.color; break; }
@@ -839,6 +866,7 @@
       }
       if (colorKey !== lastBgKey) {
         document.body.style.backgroundColor = BG_GRADIENTS[colorKey];
+        document.body.classList.toggle('dark-text', colorKey === 'yellow');
         lastBgKey = colorKey;
       }
     }

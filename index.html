@@ -248,6 +248,26 @@
       .block-num { font-size: 2rem; }
     }
 
+    /* ── Yellow period: dark text mode ──────────────────── */
+    body.dark-text { color: #1a1000; }
+    body.dark-text .nav-btn { color: rgba(0,0,0,0.75); border-color: rgba(0,0,0,0.18); background: rgba(0,0,0,0.08); }
+    body.dark-text .nav-btn:hover { background: rgba(0,0,0,0.15); }
+    body.dark-text .school-name,
+    body.dark-text .card-label,
+    body.dark-text .block-unit { color: rgba(0,0,0,0.5); }
+    body.dark-text .page-title { color: #1a1000; text-shadow: none; }
+    body.dark-text .page-subtitle,
+    body.dark-text footer,
+    body.dark-text .hours-note { color: rgba(0,0,0,0.4); }
+    body.dark-text .card { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.12); }
+    body.dark-text .block-num { color: #1a1000; background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.1); }
+    body.dark-text .colon { color: rgba(0,0,0,0.28); }
+    body.dark-text .big-num { color: #1a1000; text-shadow: none; }
+    body.dark-text .big-unit { color: rgba(0,0,0,0.6); text-shadow: none; }
+    body.dark-text .today-message { color: rgba(0,0,0,0.6); }
+    body.dark-text .card-icon { opacity: 0.45; }
+    body.dark-text .done-banner { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.45); }
+
     /* pulse animation for active today card */
     @keyframes pulse-school {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
@@ -407,10 +427,10 @@
 
   <!-- ── Top-right nav ──────────────────────────────────────── -->
   <div class="nav-btns">
-    <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
-    <a href="lunch.html" class="nav-btn">&#127869; Lunch</a>
-    <a href="calculator.html" class="nav-btn">&#128202; Grades</a>
-    <button class="nav-btn" onclick="openSettings()">&#9881; Settings</button>
+    <a href="schedule.html" class="nav-btn">Schedule</a>
+    <a href="lunch.html" class="nav-btn">Lunch</a>
+    <a href="calculator.html" class="nav-btn">Grades</a>
+    <button class="nav-btn" onclick="openSettings()">Settings</button>
   </div>
 
   <!-- ── Settings modal ────────────────────────────────────── -->
@@ -872,6 +892,7 @@
       }
       if (colorKey !== lastBgKey) {
         document.body.style.backgroundColor = INDEX_BG[colorKey];
+        document.body.classList.toggle('dark-text', colorKey === 'yellow');
         lastBgKey = colorKey;
       }
     }
