@@ -110,8 +110,8 @@
 
     /* ── Card ────────────────────────────────────────────── */
     .calc-card {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 20px;
       padding: 1.75rem;
       margin-bottom: 1rem;
@@ -161,8 +161,8 @@
 
     /* ── Inputs ──────────────────────────────────────────── */
     .inp, .sel {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
       border-radius: 8px;
       color: #fff;
       font-family: inherit;
@@ -172,10 +172,10 @@
       width: 100%;
       transition: border-color 0.2s, background 0.2s;
     }
-    .inp::placeholder { color: rgba(255,255,255,0.28); }
+    .inp::placeholder { color: rgba(255,255,255,0.45); }
     .inp:focus, .sel:focus {
-      border-color: rgba(255,255,255,0.45);
-      background: rgba(255,255,255,0.13);
+      border-color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.24);
     }
     .sel option { background: #002050; color: #fff; }
 
@@ -231,7 +231,7 @@
 
     .fg-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 0.75rem 1rem;
     }
     .fg-field { display: flex; flex-direction: column; gap: 0.35rem; }
@@ -276,6 +276,77 @@
       letter-spacing: 0.06em;
     }
 
+    /* ── GPA History ─────────────────────────────────────── */
+    .history-card {
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 0.5rem;
+    }
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.9rem;
+    }
+    .history-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .clear-btn {
+      background: rgba(255,80,80,0.15);
+      border: 1px solid rgba(255,80,80,0.25);
+      color: rgba(255,160,160,0.9);
+      border-radius: 8px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+      transition: background 0.2s;
+    }
+    .clear-btn:hover { background: rgba(255,80,80,0.28); }
+    .history-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-gpa {
+      font-size: 1.35rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    }
+    .history-date {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+    }
+    .save-snap-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: rgba(255,255,255,0.85);
+      border-radius: 10px;
+      padding: 0.45rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, color 0.15s;
+      margin-top: 0.65rem;
+      display: block;
+      width: 100%;
+    }
+    .save-snap-btn:hover { background: rgba(255,255,255,0.22); color: #fff; }
+
     @media (max-width: 500px) {
       .courses-header,
       .course-row { grid-template-columns: 1fr 88px 68px 30px; }
@@ -286,7 +357,7 @@
 <body>
 
   <div class="nav-btns">
-    <a href="index.html" class="nav-btn">&#8592; Countdown</a>
+    <a href="index.html" class="nav-btn">&#8962; Countdown</a>
     <a href="schedule.html" class="nav-btn">&#128218; Schedule</a>
     <a href="lunch.html" class="nav-btn">&#127869; Lunch</a>
   </div>
@@ -321,7 +392,9 @@
 
         <div id="courses-list"></div>
         <button class="add-btn" onclick="addCourse()">+ Add Course</button>
+        <button class="save-snap-btn" onclick="saveGPASnapshot()">&#128190; Save GPA Snapshot</button>
       </div>
+      <div id="gpa-history"></div>
     </div>
 
     <!-- ── Final Grade Panel ──────────────────────────────── -->
@@ -451,6 +524,47 @@
     addCourse('', 'A',  1);
     addCourse('', 'B+', 1);
     addCourse('', 'A-', 1);
+
+    // ── GPA History ───────────────────────────────────────────────────
+    function getGPAHistory() {
+      try { return JSON.parse(localStorage.getItem('phGPAHistory')) || []; } catch { return []; }
+    }
+
+    function saveGPASnapshot() {
+      const gpaText = document.getElementById('gpa-num').textContent;
+      if (gpaText === '—') return;
+      const history = getGPAHistory();
+      const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      history.unshift({ gpa: gpaText, date });
+      localStorage.setItem('phGPAHistory', JSON.stringify(history));
+      renderGPAHistory();
+    }
+
+    function clearGPAHistory() {
+      localStorage.removeItem('phGPAHistory');
+      renderGPAHistory();
+    }
+
+    function renderGPAHistory() {
+      const history = getGPAHistory();
+      const container = document.getElementById('gpa-history');
+      if (!history.length) { container.innerHTML = ''; return; }
+      container.innerHTML =
+        `<div class="history-card">` +
+          `<div class="history-header">` +
+            `<span class="history-title">Saved Snapshots</span>` +
+            `<button class="clear-btn" onclick="clearGPAHistory()">Clear All</button>` +
+          `</div>` +
+          history.map(h =>
+            `<div class="history-item">` +
+              `<span class="history-gpa">${h.gpa}</span>` +
+              `<span class="history-date">${h.date}</span>` +
+            `</div>`
+          ).join('') +
+        `</div>`;
+    }
+
+    renderGPAHistory();
 
     // ── Final grade calculators ───────────────────────────────────────
     function showResult(elId, num, label, note, warn) {

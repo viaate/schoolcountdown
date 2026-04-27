@@ -225,6 +225,44 @@
       text-transform: uppercase;
     }
     .modal-close:hover { background: rgba(255,255,255,0.17); }
+    .modal { max-height: 90vh; overflow-y: auto; }
+    .modal-section-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      margin: 1.25rem 0 0.6rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .cn-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.35rem 0.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .cn-row:last-of-type { border-bottom: none; }
+    .cn-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      flex: 0 0 82px;
+    }
+    .cn-inp {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 7px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.8rem;
+      padding: 0.35rem 0.5rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .cn-inp::placeholder { color: rgba(255,255,255,0.3); }
+    .cn-inp:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.13); }
 
     @media (max-width: 480px) {
       .class-name { font-size: 3rem; }
@@ -235,7 +273,7 @@
 <body id="body">
 
   <div class="nav-btns">
-    <a href="index.html" class="nav-btn">&#8592; Countdown</a>
+    <a href="index.html" class="nav-btn">&#8962; Countdown</a>
     <a href="lunch.html" class="nav-btn">&#127869; Lunch</a>
     <a href="calculator.html" class="nav-btn">&#128202; Grades</a>
     <button class="nav-btn" onclick="openSettings()">&#9881; Settings</button>
@@ -253,6 +291,15 @@
       <div class="check-row"><input type="checkbox" id="ll-wed" onchange="saveSetting('wed',this.checked)"><label for="ll-wed">Wednesday — Late Lunch</label></div>
       <div class="check-row"><input type="checkbox" id="ll-thu" onchange="saveSetting('thu',this.checked)"><label for="ll-thu">Thursday — Late Lunch</label></div>
       <div class="check-row"><input type="checkbox" id="ll-fri" onchange="saveSetting('fri',this.checked)"><label for="ll-fri">Friday — Late Lunch</label></div>
+      <div class="modal-section-title">Custom Period Names</div>
+      <p class="modal-sub" style="margin-bottom:0.7rem;margin-top:-0.35rem">Leave blank to use the color name.</p>
+      <div class="cn-row"><span class="cn-label">Red</span><input type="text" id="cn-red" class="cn-inp" placeholder="e.g. AP Biology" oninput="saveClassName('red',this.value)"></div>
+      <div class="cn-row"><span class="cn-label">Orange</span><input type="text" id="cn-orange" class="cn-inp" placeholder="e.g. English" oninput="saveClassName('orange',this.value)"></div>
+      <div class="cn-row"><span class="cn-label">Yellow</span><input type="text" id="cn-yellow" class="cn-inp" placeholder="e.g. History" oninput="saveClassName('yellow',this.value)"></div>
+      <div class="cn-row"><span class="cn-label">Green</span><input type="text" id="cn-green" class="cn-inp" placeholder="e.g. Math" oninput="saveClassName('green',this.value)"></div>
+      <div class="cn-row"><span class="cn-label">Light Blue</span><input type="text" id="cn-lightblue" class="cn-inp" placeholder="e.g. Spanish" oninput="saveClassName('lightblue',this.value)"></div>
+      <div class="cn-row"><span class="cn-label">Royal Blue</span><input type="text" id="cn-royalblue" class="cn-inp" placeholder="e.g. CS" oninput="saveClassName('royalblue',this.value)"></div>
+      <div class="cn-row"><span class="cn-label">Purple</span><input type="text" id="cn-purple" class="cn-inp" placeholder="e.g. Art" oninput="saveClassName('purple',this.value)"></div>
       <button class="modal-close" onclick="closeSettings()">Done</button>
     </div>
   </div>
@@ -298,30 +345,30 @@
 
         case 1: { // Monday
           const base = [
-            sl(8,45, 9,30,  'red',       'Red'),
-            sl(9,35, 10,20, 'orange',    'Orange'),
-            sl(10,35,11,20, 'yellow',    'Yellow'),
-            sl(11,25,12,10, 'green',     'Green'),
+            sl(8,45, 9,30,  'red',       className('red')),
+            sl(9,35, 10,20, 'orange',    className('orange')),
+            sl(10,35,11,20, 'yellow',    className('yellow')),
+            sl(11,25,12,10, 'green',     className('green')),
           ];
           const mid = lateLunch
-            ? [sl(12,10,12,55,'lightblue','Light Blue'), sl(12,55,13,40,'none','Lunch')]
-            : [sl(12,10,12,55,'none','Lunch'),           sl(12,55,13,40,'lightblue','Light Blue')];
+            ? [sl(12,10,12,55,'lightblue',className('lightblue')), sl(12,55,13,40,'none','Lunch')]
+            : [sl(12,10,12,55,'none','Lunch'),                     sl(12,55,13,40,'lightblue',className('lightblue'))];
           return [...base, ...mid,
-            sl(13,45,14,30,'royalblue','Royal Blue'),
-            sl(14,35,15,20,'purple',   'Purple'),
+            sl(13,45,14,30,'royalblue',className('royalblue')),
+            sl(14,35,15,20,'purple',   className('purple')),
           ];
         }
 
         case 2: { // Tuesday
           const base = [
-            sl(8,45, 10,0,  'yellow', 'Yellow'),
+            sl(8,45, 10,0,  'yellow', className('yellow')),
             sl(10,0, 10,15, 'none',   'Morning Meeting'),
             sl(10,15,10,45, 'none',   'Meetings Period'),
-            sl(10,45,12,0,  'orange', 'Orange'),
+            sl(10,45,12,0,  'orange', className('orange')),
           ];
           const mid = lateLunch
-            ? [sl(12,0,12,45,'red','Red'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'red','Red')]
-            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'red','Red')];
+            ? [sl(12,0,12,45,'red',className('red')), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'red',className('red'))]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'red',className('red'))];
           return [...base, ...mid,
             sl(14,5, 14,30,'none','Advisory'),
             sl(14,30,15,20,'none','Raider Hour'),
@@ -330,44 +377,44 @@
 
         case 3: { // Wednesday
           const base = [
-            sl(8,45, 10,0,  'lightblue','Light Blue'),
+            sl(8,45, 10,0,  'lightblue',className('lightblue')),
             sl(10,0, 10,45, 'none',     'Meetings Period'),
-            sl(10,45,12,0,  'green',    'Green'),
+            sl(10,45,12,0,  'green',    className('green')),
           ];
           const mid = lateLunch
-            ? [sl(12,0,12,45,'purple','Purple'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'purple','Purple')]
-            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'purple','Purple')];
+            ? [sl(12,0,12,45,'purple',className('purple')), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'purple',className('purple'))]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'purple',className('purple'))];
           return [...base, ...mid,
-            sl(14,5,15,20,'royalblue','Royal Blue'),
+            sl(14,5,15,20,'royalblue',className('royalblue')),
           ];
         }
 
         case 4: { // Thursday
           const base = [
-            sl(10,0, 11,15,'red',  'Red'),
+            sl(10,0, 11,15,'red',  className('red')),
             sl(11,15,11,30,'none', 'Morning Meetings'),
             sl(11,30,12,0, 'none', 'Meetings Period'),
           ];
           const mid = lateLunch
-            ? [sl(12,0,12,45,'orange','Orange'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'orange','Orange')]
-            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'orange','Orange')];
+            ? [sl(12,0,12,45,'orange',className('orange')), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'orange',className('orange'))]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'orange',className('orange'))];
           return [...base, ...mid,
-            sl(14,5,15,20,'yellow','Yellow'),
+            sl(14,5,15,20,'yellow',className('yellow')),
           ];
         }
 
         case 5: { // Friday
           const base = [
-            sl(8,45, 10,0,  'royalblue','Royal Blue'),
+            sl(8,45, 10,0,  'royalblue',className('royalblue')),
             sl(10,0, 10,25, 'none',     'Advisory'),
             sl(10,25,10,45, 'none',     'Meetings Period'),
-            sl(10,45,12,0,  'purple',   'Purple'),
+            sl(10,45,12,0,  'purple',   className('purple')),
           ];
           const mid = lateLunch
-            ? [sl(12,0,12,45,'green','Green'), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'green','Green')]
-            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'green','Green')];
+            ? [sl(12,0,12,45,'green',className('green')), sl(12,45,13,30,'none','Lunch'), sl(13,30,14,0,'green',className('green'))]
+            : [sl(12,0,12,45,'none','Lunch'), sl(12,45,14,0,'green',className('green'))];
           return [...base, ...mid,
-            sl(14,5,15,20,'lightblue','Light Blue'),
+            sl(14,5,15,20,'lightblue',className('lightblue')),
           ];
         }
 
@@ -383,11 +430,27 @@
       const s = getLateLunch(); s[day] = val;
       localStorage.setItem('phLateLunch', JSON.stringify(s));
     }
+    function getClassNames() {
+      try { return JSON.parse(localStorage.getItem('phClassNames')) || {}; } catch { return {}; }
+    }
+    function className(colorKey) {
+      const n = getClassNames();
+      return n[colorKey] || CLASS_COLORS[colorKey].name;
+    }
+    function saveClassName(colorKey, val) {
+      const n = getClassNames(); n[colorKey] = val.trim();
+      localStorage.setItem('phClassNames', JSON.stringify(n));
+    }
     function loadSettingsUI() {
       const s = getLateLunch();
       ['mon','tue','wed','thu','fri'].forEach(d => {
         const el = document.getElementById('ll-' + d);
         if (el) el.checked = !!s[d];
+      });
+      const n = getClassNames();
+      ['red','orange','yellow','green','lightblue','royalblue','purple'].forEach(k => {
+        const el = document.getElementById('cn-' + k);
+        if (el) el.value = n[k] || '';
       });
     }
     function openSettings()  { loadSettingsUI(); document.getElementById('modal-overlay').classList.add('open'); }
