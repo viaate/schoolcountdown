@@ -621,6 +621,14 @@
     function getLateLunch() {
       try { return JSON.parse(localStorage.getItem('phLateLunch')) || {}; } catch { return {}; }
     }
+    function getDayOverrides() {
+      try { return JSON.parse(localStorage.getItem('phDayOverride')) || {}; } catch { return {}; }
+    }
+    function getEffectiveDay(day) {
+      const dk = ['','mon','tue','wed','thu','fri'][day];
+      const o = getDayOverrides();
+      return (dk && o[dk] != null) ? o[dk] : day;
+    }
 
     function hm(h, m) { return h * 60 + m; }
 
@@ -644,7 +652,7 @@
         const ll = getLateLunch();
         const dk = ['','mon','tue','wed','thu','fri'][day];
         const mn = now.getHours() * 60 + now.getMinutes();
-        for (const sl of buildSched(day, !!ll[dk]))
+        for (const sl of buildSched(getEffectiveDay(day), !!ll[dk]))
           if (mn >= sl.s && mn < sl.e && sl.c !== 'none') { key = sl.c; break; }
       }
       if (key !== lastBg) { document.body.style.backgroundColor = BG[key]; lastBg = key; }
